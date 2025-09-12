@@ -1,0 +1,86 @@
+<!-- 微信小程序 - 用餐确认页面模板 -->
+<view class="container">
+  <!-- 页面标题 -->
+  <view class="header">
+    <text class="title">用餐确认</text>
+  </view>
+
+  <!-- 登录状态 -->
+  <view class="login-section" wx:if="{{!isLoggedIn}}">
+    <view class="login-prompt">
+      <text class="prompt-text">请先登录以确认用餐</text>
+    </view>
+    <button 
+      class="login-btn" 
+      bindtap="wechatLogin"
+      loading="{{loading}}"
+      disabled="{{loading}}"
+    >
+      {{loading ? '登录中...' : '微信登录'}}
+    </button>
+  </view>
+
+  <!-- 已登录状态 -->
+  <view class="logged-in-section" wx:if="{{isLoggedIn}}">
+    <!-- 用户信息 -->
+    <view class="user-info">
+      <image class="avatar" src="{{userInfo.avatarUrl || '/images/default-avatar.png'}}" />
+      <text class="user-name">{{userInfo.nickName}}</text>
+    </view>
+
+    <!-- 二维码信息 -->
+    <view class="qr-info">
+      <text class="qr-label">二维码标识：</text>
+      <text class="qr-code">{{qrCode}}</text>
+    </view>
+
+    <!-- 确认按钮 -->
+    <button 
+      class="confirm-btn" 
+      bindtap="confirmDining"
+      loading="{{loading}}"
+      disabled="{{loading}}"
+    >
+      {{loading ? '确认中...' : '确认用餐'}}
+    </button>
+  </view>
+
+  <!-- 确认结果 -->
+  <view class="result-section" wx:if="{{scanResult}}">
+    <view class="result-card {{scanResult.success ? 'success' : 'error'}}">
+      <view class="result-icon">
+        <text class="icon">{{scanResult.success ? '✅' : '❌'}}</text>
+      </view>
+      <view class="result-content">
+        <text class="result-title">{{scanResult.success ? '确认成功' : '确认失败'}}</text>
+        <text class="result-message">{{scanResult.message}}</text>
+        
+        <!-- 成功时显示详细信息 -->
+        <view class="result-details" wx:if="{{scanResult.success && scanResult.data}}">
+          <view class="detail-item">
+            <text class="detail-label">餐次：</text>
+            <text class="detail-value">{{scanResult.data.mealTypeName}}</text>
+          </view>
+          <view class="detail-item">
+            <text class="detail-label">日期：</text>
+            <text class="detail-value">{{scanResult.data.diningDate}}</text>
+          </view>
+          <view class="detail-item">
+            <text class="detail-label">时间：</text>
+            <text class="detail-value">{{scanResult.data.scanTime}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 操作按钮 -->
+    <view class="action-buttons">
+      <button class="retry-btn" bindtap="retryConfirm" wx:if="{{!scanResult.success}}">
+        重新确认
+      </button>
+      <button class="home-btn" bindtap="goHome">
+        返回首页
+      </button>
+    </view>
+  </view>
+</view>

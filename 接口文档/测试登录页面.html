@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>部门报餐系统 - 测试登录</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            border-bottom: 2px solid #4facfe;
+            padding-bottom: 5px;
+        }
+
+        .login-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .btn-info {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+
+        .department-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .dept-btn {
+            padding: 10px 15px;
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        .dept-btn:hover {
+            background: #4facfe;
+            color: white;
+            border-color: #4facfe;
+        }
+
+        .user-info {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .user-info h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .info-item {
+            display: flex;
+            margin-bottom: 8px;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #666;
+            min-width: 80px;
+        }
+
+        .info-value {
+            color: #333;
+        }
+
+        .permissions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 10px;
+        }
+
+        .permission-tag {
+            background: #4facfe;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+        }
+
+        .api-test {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .api-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+
+        .api-btn {
+            padding: 8px 16px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .api-btn:hover {
+            background: #218838;
+        }
+
+        .api-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+
+        .response {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #4facfe;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            border-radius: 4px;
+            padding: 10px;
+            margin-top: 10px;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            border-radius: 4px;
+            padding: 10px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏢 部门报餐系统</h1>
+            <p>测试登录接口 - 前端开发专用</p>
+        </div>
+
+        <div class="content">
+            <!-- 基础登录 -->
+            <div class="section">
+                <h2>🔐 基础角色登录</h2>
+                <div class="login-buttons">
+                    <button class="btn btn-primary" onclick="login('user')">
+                        👤 普通用户登录
+                    </button>
+                    <button class="btn btn-success" onclick="login('deptAdmin')">
+                        👨‍💼 部门管理员登录
+                    </button>
+                    <button class="btn btn-warning" onclick="login('sysAdmin')">
+                        👑 系统管理员登录
+                    </button>
+                </div>
+            </div>
+
+            <!-- 指定部门登录 -->
+            <div class="section">
+                <h2>🏢 指定部门管理员登录</h2>
+                <p>选择特定部门的管理员进行登录测试：</p>
+                <div class="department-grid">
+                    <button class="dept-btn" onclick="loginDeptAdmin('GEO_DATA')">
+                        地质数据中心<br><small>13800001001</small>
+                    </button>
+                    <button class="dept-btn" onclick="loginDeptAdmin('GEO_ENG')">
+                        地质工程中心<br><small>13800001002</small>
+                    </button>
+                    <button class="dept-btn" onclick="loginDeptAdmin('ECO_ENV')">
+                        生态环境中心<br><small>13800001003</small>
+                    </button>
+                    <button class="dept-btn" onclick="loginDeptAdmin('GEO_ENV')">
+                        地质环境中心<br><small>13800001004</small>
+                    </button>
+                    <button class="dept-btn" onclick="loginDeptAdmin('GEO_SURVEY')">
+                        地质调查中心<br><small>13800001005</small>
+                    </button>
+                    <button class="dept-btn" onclick="loginDeptAdmin('HUANGMEI')">
+                        黄梅分站<br><small>13800001006</small>
+                    </button>
+                    <button class="dept-btn" onclick="loginDeptAdmin('MINING_CO')">
+                        矿业有限责任公司<br><small>13800001007</small>
+                    </button>
+                    <button class="dept-btn" onclick="loginDeptAdmin('PROPERTY')">
+                        物业中心<br><small>13800001008</small>
+                    </button>
+                    <button class="dept-btn" onclick="loginDeptAdmin('ADMIN')">
+                        机关科室<br><small>13800001009</small>
+                    </button>
+                    <button class="dept-btn" onclick="loginDeptAdmin('TECH')">
+                        技术部<br><small>13800000001</small>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 用户信息显示 -->
+            <div id="userInfo" class="user-info" style="display: none;">
+                <h3>👤 当前用户信息</h3>
+                <div class="info-item">
+                    <span class="info-label">姓名:</span>
+                    <span class="info-value" id="userName">-</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">角色:</span>
+                    <span class="info-value" id="userRole">-</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">部门:</span>
+                    <span class="info-value" id="userDepartment">-</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">手机号:</span>
+                    <span class="info-value" id="userPhone">-</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">权限:</span>
+                    <div class="permissions" id="userPermissions"></div>
+                </div>
+            </div>
+
+            <!-- API测试 -->
+            <div class="api-test">
+                <h3>🧪 API功能测试</h3>
+                <p>登录后可以测试以下功能：</p>
+                <div class="api-buttons">
+                    <button class="api-btn" onclick="testAPI('dept-members')" disabled id="btn-dept-members">
+                        获取部门成员
+                    </button>
+                    <button class="api-btn" onclick="testAPI('department-orders')" disabled id="btn-department-orders">
+                        获取报餐记录
+                    </button>
+                    <button class="api-btn" onclick="testAPI('department-stats')" disabled id="btn-department-stats">
+                        获取报餐统计
+                    </button>
+                    <button class="api-btn" onclick="testAPI('department-overview')" disabled id="btn-department-overview">
+                        获取报餐概览
+                    </button>
+                </div>
+                <div id="apiResponse" class="response" style="display: none;"></div>
+            </div>
+
+            <!-- 加载状态 -->
+            <div id="loading" class="loading">
+                <div class="spinner"></div>
+                <p>正在处理请求...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const BASE_URL = 'http://localhost:3000';
+        let currentToken = null;
+        let currentUserInfo = null;
+
+        // 显示加载状态
+        function showLoading() {
+            document.getElementById('loading').style.display = 'block';
+        }
+
+        // 隐藏加载状态
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+        }
+
+        // 显示消息
+        function showMessage(message, type = 'success') {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = type;
+            messageDiv.textContent = message;
+            document.querySelector('.content').insertBefore(messageDiv, document.querySelector('.section'));
+            
+            setTimeout(() => {
+                messageDiv.remove();
+            }, 3000);
+        }
+
+        // 基础登录
+        async function login(type) {
+            showLoading();
+            try {
+                let url;
+                switch (type) {
+                    case 'user':
+                        url = '/api/auth/test-login';
+                        break;
+                    case 'deptAdmin':
+                        url = '/api/auth/test-login-admin';
+                        break;
+                    case 'sysAdmin':
+                        url = '/api/auth/test-login-sys-admin';
+                        break;
+                }
+
+                const response = await fetch(BASE_URL + url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    currentToken = data.data.token;
+                    currentUserInfo = data.data.userInfo;
+                    displayUserInfo(currentUserInfo);
+                    enableAPITests();
+                    showMessage(`${data.message}`, 'success');
+                } else {
+                    showMessage(`登录失败: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                showMessage(`登录失败: ${error.message}`, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // 指定部门管理员登录
+        async function loginDeptAdmin(departmentCode) {
+            showLoading();
+            try {
+                const response = await fetch(BASE_URL + '/api/auth/test-login-dept-admin', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ departmentCode })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    currentToken = data.data.token;
+                    currentUserInfo = data.data.userInfo;
+                    displayUserInfo(currentUserInfo);
+                    enableAPITests();
+                    showMessage(`${data.message}`, 'success');
+                } else {
+                    showMessage(`登录失败: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                showMessage(`登录失败: ${error.message}`, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // 显示用户信息
+        function displayUserInfo(userInfo) {
+            document.getElementById('userName').textContent = userInfo.nickName || '-';
+            document.getElementById('userRole').textContent = userInfo.role || '-';
+            document.getElementById('userDepartment').textContent = userInfo.department || '-';
+            document.getElementById('userPhone').textContent = userInfo.phoneNumber || '-';
+            
+            const permissionsDiv = document.getElementById('userPermissions');
+            permissionsDiv.innerHTML = '';
+            if (userInfo.permissions && userInfo.permissions.length > 0) {
+                userInfo.permissions.forEach(permission => {
+                    const tag = document.createElement('span');
+                    tag.className = 'permission-tag';
+                    tag.textContent = permission;
+                    permissionsDiv.appendChild(tag);
+                });
+            }
+            
+            document.getElementById('userInfo').style.display = 'block';
+        }
+
+        // 启用API测试按钮
+        function enableAPITests() {
+            const buttons = document.querySelectorAll('.api-btn');
+            buttons.forEach(btn => btn.disabled = false);
+        }
+
+        // 测试API
+        async function testAPI(apiType) {
+            if (!currentToken) {
+                showMessage('请先登录', 'error');
+                return;
+            }
+
+            showLoading();
+            try {
+                let url;
+                switch (apiType) {
+                    case 'dept-members':
+                        url = '/api/dining/enhanced/dept-members';
+                        break;
+                    case 'department-orders':
+                        url = '/api/dining/enhanced/department-orders';
+                        break;
+                    case 'department-stats':
+                        url = '/api/dining/enhanced/department-stats';
+                        break;
+                    case 'department-overview':
+                        url = '/api/dining/enhanced/department-overview';
+                        break;
+                }
+
+                const response = await fetch(BASE_URL + url, {
+                    headers: {
+                        'Authorization': `Bearer ${currentToken}`
+                    }
+                });
+
+                const data = await response.json();
+                
+                const responseDiv = document.getElementById('apiResponse');
+                responseDiv.style.display = 'block';
+                responseDiv.textContent = JSON.stringify(data, null, 2);
+                
+                if (data.success) {
+                    showMessage(`API调用成功: ${apiType}`, 'success');
+                } else {
+                    showMessage(`API调用失败: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                showMessage(`API调用失败: ${error.message}`, 'error');
+                const responseDiv = document.getElementById('apiResponse');
+                responseDiv.style.display = 'block';
+                responseDiv.textContent = `错误: ${error.message}`;
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // 页面加载完成后的初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('部门报餐系统测试登录页面已加载');
+            console.log('后端服务地址:', BASE_URL);
+        });
+    </script>
+</body>
+</html>

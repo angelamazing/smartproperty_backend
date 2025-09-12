@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>前端时间处理测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+        }
+        .test-title {
+            color: #333;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        .test-item {
+            margin: 10px 0;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 4px;
+        }
+        .test-input {
+            font-family: monospace;
+            color: #666;
+        }
+        .test-output {
+            font-weight: bold;
+            color: #28a745;
+        }
+        .test-error {
+            color: #dc3545;
+        }
+        .status-tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            color: white;
+        }
+        .status-green { background-color: #28a745; }
+        .status-blue { background-color: #007bff; }
+        .status-orange { background-color: #fd7e14; }
+        .status-red { background-color: #dc3545; }
+        .status-gray { background-color: #6c757d; }
+        .form-group {
+            margin: 15px 0;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .btn {
+            background: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .btn:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🕐 前端时间处理测试</h1>
+        <p>本页面用于测试前端时间处理工具类的各种功能</p>
+    </div>
+
+    <!-- 基本功能测试 -->
+    <div class="container">
+        <div class="test-section">
+            <h2 class="test-title">📋 基本功能测试</h2>
+            
+            <div class="test-item">
+                <div class="test-input">输入: 2024-01-15T10:30:00.000Z (UTC时间)</div>
+                <div class="test-output">北京时间显示: <span id="basic-format"></span></div>
+            </div>
+            
+            <div class="test-item">
+                <div class="test-input">输入: 2024-01-15T10:30:00.000Z (UTC时间)</div>
+                <div class="test-output">相对时间: <span id="basic-relative"></span></div>
+            </div>
+            
+            <div class="test-item">
+                <div class="test-input">输入: 2024-01-15 18:30:00 (北京时间)</div>
+                <div class="test-output">UTC时间: <span id="basic-utc"></span></div>
+            </div>
+            
+            <div class="test-item">
+                <div class="test-input">当前日期: <span id="current-date"></span></div>
+                <div class="test-input">当前时间: <span id="current-time"></span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 时间状态测试 -->
+    <div class="container">
+        <div class="test-section">
+            <h2 class="test-title">🎯 时间状态测试</h2>
+            
+            <div class="test-item">
+                <div class="test-input">输入: 2024-01-15T10:30:00.000Z</div>
+                <div class="test-output">状态: <span id="status-1" class="status-tag"></span></div>
+            </div>
+            
+            <div class="test-item">
+                <div class="test-input">输入: 刚刚的时间</div>
+                <div class="test-output">状态: <span id="status-2" class="status-tag"></span></div>
+            </div>
+            
+            <div class="test-item">
+                <div class="test-input">输入: 1小时前的时间</div>
+                <div class="test-output">状态: <span id="status-3" class="status-tag"></span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 日期验证测试 -->
+    <div class="container">
+        <div class="test-section">
+            <h2 class="test-title">📅 日期验证测试</h2>
+            
+            <div class="test-item">
+                <div class="test-input">今天: <span id="today-test"></span></div>
+                <div class="test-input">昨天: <span id="yesterday-test"></span></div>
+                <div class="test-input">明天: <span id="tomorrow-test"></span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 交互式测试 -->
+    <div class="container">
+        <div class="test-section">
+            <h2 class="test-title">🔧 交互式测试</h2>
+            
+            <div class="form-group">
+                <label for="test-time">输入时间 (UTC格式):</label>
+                <input type="text" id="test-time" placeholder="2024-01-15T10:30:00.000Z" value="2024-01-15T10:30:00.000Z">
+            </div>
+            
+            <div class="form-group">
+                <label for="test-format">显示格式:</label>
+                <select id="test-format">
+                    <option value="YYYY-MM-DD HH:mm:ss">YYYY-MM-DD HH:mm:ss</option>
+                    <option value="YYYY-MM-DD HH:mm">YYYY-MM-DD HH:mm</option>
+                    <option value="YYYY-MM-DD">YYYY-MM-DD</option>
+                    <option value="HH:mm:ss">HH:mm:ss</option>
+                    <option value="MM-DD HH:mm">MM-DD HH:mm</option>
+                </select>
+            </div>
+            
+            <button class="btn" onclick="testCustomTime()">测试格式化</button>
+            <button class="btn" onclick="testRelativeTime()">测试相对时间</button>
+            <button class="btn" onclick="testTimeStatus()">测试时间状态</button>
+            
+            <div id="custom-result" class="test-item" style="display: none;">
+                <div class="test-output">结果: <span id="custom-output"></span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 性能测试 -->
+    <div class="container">
+        <div class="test-section">
+            <h2 class="test-title">⚡ 性能测试</h2>
+            
+            <button class="btn" onclick="testPerformance()">运行性能测试</button>
+            <div id="performance-result" class="test-item" style="display: none;">
+                <div class="test-output">结果: <span id="performance-output"></span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 错误处理测试 -->
+    <div class="container">
+        <div class="test-section">
+            <h2 class="test-title">🚨 错误处理测试</h2>
+            
+            <div class="test-item">
+                <div class="test-input">输入: null</div>
+                <div class="test-output">安全格式化: <span id="error-null"></span></div>
+            </div>
+            
+            <div class="test-item">
+                <div class="test-input">输入: "invalid-time"</div>
+                <div class="test-output">安全格式化: <span id="error-invalid"></span></div>
+            </div>
+            
+            <div class="test-item">
+                <div class="test-input">输入: ""</div>
+                <div class="test-output">安全格式化: <span id="error-empty"></span></div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // 模拟TimeUtils类（实际使用时需要导入）
+        class MockTimeUtils {
+            static formatTime(time, format = 'YYYY-MM-DD HH:mm:ss') {
+                if (!time) return '';
+                const date = new Date(time);
+                const beijingTime = new Date(date.getTime() + 8 * 60 * 60 * 1000);
+                
+                const year = beijingTime.getUTCFullYear();
+                const month = String(beijingTime.getUTCMonth() + 1).padStart(2, '0');
+                const day = String(beijingTime.getUTCDate()).padStart(2, '0');
+                const hours = String(beijingTime.getUTCHours()).padStart(2, '0');
+                const minutes = String(beijingTime.getUTCMinutes()).padStart(2, '0');
+                const seconds = String(beijingTime.getUTCSeconds()).padStart(2, '0');
+                
+                return format
+                    .replace('YYYY', year)
+                    .replace('MM', month)
+                    .replace('DD', day)
+                    .replace('HH', hours)
+                    .replace('mm', minutes)
+                    .replace('ss', seconds);
+            }
+
+            static getRelativeTime(time) {
+                if (!time) return '';
+                const now = new Date();
+                const target = new Date(time);
+                const diff = now - target;
+                
+                const minutes = Math.floor(diff / 60000);
+                const hours = Math.floor(diff / 3600000);
+                const days = Math.floor(diff / 86400000);
+                
+                if (minutes < 1) return '刚刚';
+                if (minutes < 60) return `${minutes}分钟前`;
+                if (hours < 24) return `${hours}小时前`;
+                if (days < 7) return `${days}天前`;
+                return this.formatTime(time, 'YYYY-MM-DD');
+            }
+
+            static toUTCForSubmit(beijingTime) {
+                if (!beijingTime) return '';
+                const date = new Date(beijingTime);
+                return new Date(date.getTime() - 8 * 60 * 60 * 1000).toISOString();
+            }
+
+            static getCurrentDate() {
+                const now = new Date();
+                const beijingTime = new Date(now.getTime() + 8 * 60 * 60 * 1000);
+                return beijingTime.toISOString().split('T')[0];
+            }
+
+            static getCurrentTime() {
+                const now = new Date();
+                const beijingTime = new Date(now.getTime() + 8 * 60 * 60 * 1000);
+                return beijingTime.toISOString().split('T')[1].substring(0, 5);
+            }
+
+            static isValidTime(timeString) {
+                return !isNaN(new Date(timeString).getTime());
+            }
+
+            static isToday(date) {
+                if (!date) return false;
+                const targetDate = new Date(date);
+                const today = new Date();
+                const beijingToday = new Date(today.getTime() + 8 * 60 * 60 * 1000);
+                
+                return targetDate.toDateString() === beijingToday.toDateString();
+            }
+
+            static isPastDate(date) {
+                if (!date) return false;
+                const targetDate = new Date(date);
+                const today = new Date();
+                const beijingToday = new Date(today.getTime() + 8 * 60 * 60 * 1000);
+                
+                return targetDate < beijingToday;
+            }
+
+            static isFutureDate(date) {
+                if (!date) return false;
+                const targetDate = new Date(date);
+                const today = new Date();
+                const beijingToday = new Date(today.getTime() + 8 * 60 * 60 * 1000);
+                
+                return targetDate > beijingToday;
+            }
+
+            static safeFormatTime(time, format = 'YYYY-MM-DD HH:mm:ss') {
+                try {
+                    if (!time) return '--';
+                    if (!this.isValidTime(time)) return '无效时间';
+                    return this.formatTime(time, format);
+                } catch (error) {
+                    console.error('时间格式化错误:', error);
+                    return '--';
+                }
+            }
+
+            static getTimeStatus(time) {
+                if (!time) return { status: 'invalid', text: '--', color: 'gray' };
+                
+                const targetTime = new Date(time);
+                const now = new Date();
+                const diff = now - targetTime;
+                const minutes = Math.floor(diff / 60000);
+                
+                if (minutes < 5) return { status: 'new', text: '刚刚', color: 'green' };
+                if (minutes < 30) return { status: 'recent', text: `${minutes}分钟前`, color: 'blue' };
+                if (minutes < 60) return { status: 'old', text: `${Math.floor(minutes / 60)}小时前`, color: 'orange' };
+                if (minutes < 1440) return { status: 'very-old', text: `${Math.floor(minutes / 1440)}天前`, color: 'red' };
+                
+                return { status: 'past', text: this.formatTime(time, 'YYYY-MM-DD'), color: 'gray' };
+            }
+        }
+
+        // 初始化测试
+        function initTests() {
+            // 基本功能测试
+            document.getElementById('basic-format').textContent = 
+                MockTimeUtils.formatTime('2024-01-15T10:30:00.000Z', 'YYYY-MM-DD HH:mm:ss');
+            
+            document.getElementById('basic-relative').textContent = 
+                MockTimeUtils.getRelativeTime('2024-01-15T10:30:00.000Z');
+            
+            document.getElementById('basic-utc').textContent = 
+                MockTimeUtils.toUTCForSubmit('2024-01-15 18:30:00');
+            
+            document.getElementById('current-date').textContent = 
+                MockTimeUtils.getCurrentDate();
+            
+            document.getElementById('current-time').textContent = 
+                MockTimeUtils.getCurrentTime();
+
+            // 时间状态测试
+            const status1 = MockTimeUtils.getTimeStatus('2024-01-15T10:30:00.000Z');
+            const status1El = document.getElementById('status-1');
+            status1El.textContent = status1.text;
+            status1El.className = `status-tag status-${status1.color}`;
+
+            const status2 = MockTimeUtils.getTimeStatus(new Date().toISOString());
+            const status2El = document.getElementById('status-2');
+            status2El.textContent = status2.text;
+            status2El.className = `status-tag status-${status2.color}`;
+
+            const status3 = MockTimeUtils.getTimeStatus(new Date(Date.now() - 60 * 60 * 1000).toISOString());
+            const status3El = document.getElementById('status-3');
+            status3El.textContent = status3.text;
+            status3El.className = `status-tag status-${status3.color}`;
+
+            // 日期验证测试
+            const today = new Date().toISOString();
+            const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+            const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+
+            document.getElementById('today-test').textContent = 
+                MockTimeUtils.isToday(today) ? '✅ 是今天' : '❌ 不是今天';
+            
+            document.getElementById('yesterday-test').textContent = 
+                MockTimeUtils.isPastDate(yesterday) ? '✅ 是过去' : '❌ 不是过去';
+            
+            document.getElementById('tomorrow-test').textContent = 
+                MockTimeUtils.isFutureDate(tomorrow) ? '✅ 是未来' : '❌ 不是未来';
+
+            // 错误处理测试
+            document.getElementById('error-null').textContent = 
+                MockTimeUtils.safeFormatTime(null);
+            
+            document.getElementById('error-invalid').textContent = 
+                MockTimeUtils.safeFormatTime('invalid-time');
+            
+            document.getElementById('error-empty').textContent = 
+                MockTimeUtils.safeFormatTime('');
+        }
+
+        // 交互式测试函数
+        window.testCustomTime = function() {
+            const time = document.getElementById('test-time').value;
+            const format = document.getElementById('test-format').value;
+            const result = MockTimeUtils.formatTime(time, format);
+            
+            document.getElementById('custom-output').textContent = result;
+            document.getElementById('custom-result').style.display = 'block';
+        };
+
+        window.testRelativeTime = function() {
+            const time = document.getElementById('test-time').value;
+            const result = MockTimeUtils.getRelativeTime(time);
+            
+            document.getElementById('custom-output').textContent = result;
+            document.getElementById('custom-result').style.display = 'block';
+        };
+
+        window.testTimeStatus = function() {
+            const time = document.getElementById('test-time').value;
+            const status = MockTimeUtils.getTimeStatus(time);
+            
+            document.getElementById('custom-output').innerHTML = 
+                `<span class="status-tag status-${status.color}">${status.text}</span>`;
+            document.getElementById('custom-result').style.display = 'block';
+        };
+
+        window.testPerformance = function() {
+            const startTime = performance.now();
+            const testCount = 10000;
+            
+            // 测试格式化性能
+            for (let i = 0; i < testCount; i++) {
+                MockTimeUtils.formatTime('2024-01-15T10:30:00.000Z', 'YYYY-MM-DD HH:mm:ss');
+            }
+            
+            const endTime = performance.now();
+            const duration = endTime - startTime;
+            
+            document.getElementById('performance-output').innerHTML = 
+                `格式化 ${testCount} 次用时: ${duration.toFixed(2)}ms<br>` +
+                `平均每次: ${(duration / testCount).toFixed(4)}ms`;
+            document.getElementById('performance-result').style.display = 'block';
+        };
+
+        // 页面加载完成后初始化测试
+        document.addEventListener('DOMContentLoaded', initTests);
+    </script>
+</body>
+</html>

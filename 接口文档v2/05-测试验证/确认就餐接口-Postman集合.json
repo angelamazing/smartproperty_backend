@@ -1,0 +1,621 @@
+{
+  "info": {
+    "name": "确认就餐功能接口",
+    "description": "智慧物业管理系统 - 确认就餐功能API接口集合",
+    "version": "1.0.0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{jwt_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "jwt_token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "用户端接口",
+      "item": [
+        {
+          "name": "获取就餐确认状态",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/dining-confirmation/status?date=2024-01-15",
+              "host": ["{{base_url}}"],
+              "path": ["api", "dining-confirmation", "status"],
+              "query": [
+                {
+                  "key": "date",
+                  "value": "2024-01-15",
+                  "description": "查询日期，格式：YYYY-MM-DD，可选"
+                }
+              ]
+            },
+            "description": "获取用户指定日期的就餐确认状态"
+          },
+          "response": [
+            {
+              "name": "成功响应",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/dining-confirmation/status",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "dining-confirmation", "status"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"message\": \"获取就餐确认状态成功\",\n  \"data\": {\n    \"userId\": \"user_id_1\",\n    \"userName\": \"张三\",\n    \"department\": \"技术部\",\n    \"queryDate\": \"2024-01-15\",\n    \"mealConfirmationStatus\": {\n      \"breakfast\": {\n        \"isRegistered\": true,\n        \"orderId\": \"order_id_1\",\n        \"status\": \"confirmed\",\n        \"diningStatus\": \"dined\",\n        \"statusText\": \"已确认\",\n        \"confirmationText\": \"已就餐\",\n        \"actualDiningTime\": \"2024-01-15 08:30:00\",\n        \"registerTime\": \"2024-01-15 07:00:00\",\n        \"remark\": \"今日早餐\"\n      },\n      \"lunch\": {\n        \"isRegistered\": true,\n        \"orderId\": \"order_id_2\",\n        \"status\": \"confirmed\",\n        \"diningStatus\": \"ordered\",\n        \"statusText\": \"已确认\",\n        \"confirmationText\": \"已报餐\",\n        \"actualDiningTime\": null,\n        \"registerTime\": \"2024-01-15 10:00:00\",\n        \"remark\": \"今日午餐\"\n      },\n      \"dinner\": {\n        \"isRegistered\": false,\n        \"orderId\": null,\n        \"status\": null,\n        \"diningStatus\": null,\n        \"statusText\": \"未报餐\",\n        \"confirmationText\": \"未确认\",\n        \"actualDiningTime\": null,\n        \"registerTime\": null,\n        \"remark\": null\n      }\n    },\n    \"summary\": {\n      \"totalRegistered\": 2,\n      \"totalConfirmed\": 1,\n      \"pendingConfirmation\": 1,\n      \"unregisteredCount\": 1\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "用户手动确认就餐",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"confirmationType\": \"manual\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/dining-confirmation/manual/:orderId",
+              "host": ["{{base_url}}"],
+              "path": ["api", "dining-confirmation", "manual", ":orderId"],
+              "variable": [
+                {
+                  "key": "orderId",
+                  "value": "order_id_1",
+                  "description": "订单ID"
+                }
+              ]
+            },
+            "description": "用户自己确认已就餐"
+          },
+          "response": [
+            {
+              "name": "成功响应",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwt_token}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"confirmationType\": \"manual\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/dining-confirmation/manual/order_id_1",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "dining-confirmation", "manual", "order_id_1"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"message\": \"确认就餐成功\",\n  \"data\": {\n    \"orderId\": \"order_id_1\",\n    \"confirmationType\": \"manual\",\n    \"actualDiningTime\": \"2024-01-15 12:30:00\",\n    \"message\": \"确认就餐成功\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "获取就餐确认历史",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/dining-confirmation/history?page=1&pageSize=20&diningStatus=dined",
+              "host": ["{{base_url}}"],
+              "path": ["api", "dining-confirmation", "history"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "页码"
+                },
+                {
+                  "key": "pageSize",
+                  "value": "20",
+                  "description": "每页大小"
+                },
+                {
+                  "key": "diningStatus",
+                  "value": "dined",
+                  "description": "就餐状态：ordered/dined/cancelled，可选"
+                }
+              ]
+            },
+            "description": "获取用户的就餐确认历史记录"
+          },
+          "response": [
+            {
+              "name": "成功响应",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/dining-confirmation/history?page=1&pageSize=20",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "dining-confirmation", "history"],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "pageSize",
+                      "value": "20"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"message\": \"获取就餐确认历史成功\",\n  \"data\": {\n    \"records\": [\n      {\n        \"orderId\": \"order_id_1\",\n        \"diningDate\": \"2024-01-15\",\n        \"mealType\": \"breakfast\",\n        \"mealTypeName\": \"早餐\",\n        \"status\": \"confirmed\",\n        \"diningStatus\": \"dined\",\n        \"statusText\": \"已确认\",\n        \"confirmationText\": \"已就餐\",\n        \"actualDiningTime\": \"2024-01-15 08:30:00\",\n        \"registerTime\": \"2024-01-15 07:00:00\",\n        \"remark\": \"今日早餐\",\n        \"confirmationType\": \"manual\",\n        \"confirmationTime\": \"2024-01-15 08:30:00\",\n        \"confirmedBy\": null\n      }\n    ],\n    \"total\": 1,\n    \"page\": 1,\n    \"pageSize\": 20,\n    \"hasMore\": false\n  }\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "管理员端接口",
+      "item": [
+        {
+          "name": "管理员代确认就餐",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"remark\": \"管理员代确认就餐\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/dining-confirmation/admin/:orderId",
+              "host": ["{{base_url}}"],
+              "path": ["api", "dining-confirmation", "admin", ":orderId"],
+              "variable": [
+                {
+                  "key": "orderId",
+                  "value": "order_id_1",
+                  "description": "订单ID"
+                }
+              ]
+            },
+            "description": "管理员代为确认用户已就餐（需要管理员权限）"
+          },
+          "response": [
+            {
+              "name": "成功响应",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwt_token}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"remark\": \"管理员代确认就餐\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/dining-confirmation/admin/order_id_1",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "dining-confirmation", "admin", "order_id_1"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"message\": \"管理员代确认就餐成功\",\n  \"data\": {\n    \"orderId\": \"order_id_1\",\n    \"confirmationType\": \"admin\",\n    \"actualDiningTime\": \"2024-01-15 12:30:00\",\n    \"confirmedBy\": \"admin_id\",\n    \"message\": \"管理员代确认就餐成功\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "批量确认就餐",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderIds\": [\"order_id_1\", \"order_id_2\", \"order_id_3\"],\n  \"remark\": \"批量确认就餐\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/dining-confirmation/batch",
+              "host": ["{{base_url}}"],
+              "path": ["api", "dining-confirmation", "batch"]
+            },
+            "description": "管理员批量确认多个订单的就餐状态（需要管理员权限）"
+          },
+          "response": [
+            {
+              "name": "成功响应",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{jwt_token}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"orderIds\": [\"order_id_1\", \"order_id_2\", \"order_id_3\"],\n  \"remark\": \"批量确认就餐\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/dining-confirmation/batch",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "dining-confirmation", "batch"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"message\": \"批量确认完成，成功 2 个\",\n  \"data\": {\n    \"successCount\": 2,\n    \"totalCount\": 3,\n    \"errors\": [\n      {\n        \"orderId\": \"order_id_3\",\n        \"error\": \"该订单已确认就餐\"\n      }\n    ]\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "获取待确认就餐列表",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/dining-confirmation/pending?page=1&pageSize=20&mealType=lunch",
+              "host": ["{{base_url}}"],
+              "path": ["api", "dining-confirmation", "pending"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "页码"
+                },
+                {
+                  "key": "pageSize",
+                  "value": "20",
+                  "description": "每页大小"
+                },
+                {
+                  "key": "mealType",
+                  "value": "lunch",
+                  "description": "餐次类型：breakfast/lunch/dinner，可选"
+                }
+              ]
+            },
+            "description": "获取待确认就餐的订单列表（管理员功能）"
+          },
+          "response": [
+            {
+              "name": "成功响应",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/dining-confirmation/pending?page=1&pageSize=20",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "dining-confirmation", "pending"],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "pageSize",
+                      "value": "20"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"message\": \"获取待确认就餐列表成功\",\n  \"data\": {\n    \"records\": [\n      {\n        \"orderId\": \"order_id_1\",\n        \"deptName\": \"技术部\",\n        \"userId\": \"user_id_1\",\n        \"userName\": \"张三\",\n        \"mealType\": \"lunch\",\n        \"mealTypeName\": \"午餐\",\n        \"diningDate\": \"2024-01-15\",\n        \"registerTime\": \"2024-01-15 10:00:00\",\n        \"remark\": \"今日午餐\",\n        \"currentUserDept\": \"技术部\"\n      }\n    ],\n    \"total\": 1,\n    \"page\": 1,\n    \"pageSize\": 20,\n    \"hasMore\": false\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "获取部门就餐确认统计",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/dining-confirmation/stats?date=2024-01-15",
+              "host": ["{{base_url}}"],
+              "path": ["api", "dining-confirmation", "stats"],
+              "query": [
+                {
+                  "key": "date",
+                  "value": "2024-01-15",
+                  "description": "查询日期，格式：YYYY-MM-DD，默认今日"
+                }
+              ]
+            },
+            "description": "获取部门就餐确认统计数据（管理员功能）"
+          },
+          "response": [
+            {
+              "name": "成功响应",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/dining-confirmation/stats",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "dining-confirmation", "stats"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"message\": \"获取部门就餐确认统计成功\",\n  \"data\": {\n    \"queryDate\": \"2024-01-15\",\n    \"totalStats\": {\n      \"totalOrders\": 156,\n      \"pendingConfirmation\": 45,\n      \"confirmedDining\": 98,\n      \"cancelledOrders\": 13\n    },\n    \"mealStats\": [\n      {\n        \"mealType\": \"breakfast\",\n        \"mealTypeName\": \"早餐\",\n        \"totalOrders\": 45,\n        \"pendingConfirmation\": 12,\n        \"confirmedDining\": 30,\n        \"cancelledOrders\": 3\n      },\n      {\n        \"mealType\": \"lunch\",\n        \"mealTypeName\": \"午餐\",\n        \"totalOrders\": 78,\n        \"pendingConfirmation\": 25,\n        \"confirmedDining\": 48,\n        \"cancelledOrders\": 5\n      },\n      {\n        \"mealType\": \"dinner\",\n        \"mealTypeName\": \"晚餐\",\n        \"totalOrders\": 33,\n        \"pendingConfirmation\": 8,\n        \"confirmedDining\": 20,\n        \"cancelledOrders\": 5\n      }\n    ],\n    \"departmentStats\": [\n      {\n        \"deptName\": \"技术部\",\n        \"totalOrders\": 89,\n        \"pendingConfirmation\": 25,\n        \"confirmedDining\": 58,\n        \"cancelledOrders\": 6\n      },\n      {\n        \"deptName\": \"人事部\",\n        \"totalOrders\": 45,\n        \"pendingConfirmation\": 12,\n        \"confirmedDining\": 28,\n        \"cancelledOrders\": 5\n      }\n    ]\n  }\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "认证接口",
+      "item": [
+        {
+          "name": "用户登录",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"test_user\",\n  \"password\": \"test_password\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "用户登录获取JWT Token"
+          },
+          "response": [
+            {
+              "name": "成功响应",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"username\": \"test_user\",\n  \"password\": \"test_password\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/auth/login",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "auth", "login"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"message\": \"登录成功\",\n  \"data\": {\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n    \"user\": {\n      \"_id\": \"user_id_1\",\n      \"nickName\": \"张三\",\n      \"role\": \"user\",\n      \"department\": \"技术部\"\n    }\n  }\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// 自动设置JWT Token",
+          "if (pm.response && pm.response.json() && pm.response.json().data && pm.response.json().data.token) {",
+          "    pm.collectionVariables.set('jwt_token', pm.response.json().data.token);",
+          "}"
+        ]
+      }
+    }
+  ]
+}

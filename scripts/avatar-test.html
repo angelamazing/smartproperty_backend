@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>头像访问测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .avatar-container {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            margin: 10px 0;
+        }
+        
+        .user-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #e0e0e0;
+        }
+        
+        .success { color: #28a745; }
+        .error { color: #dc3545; }
+        .info { color: #17a2b8; }
+        
+        .log {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 10px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 头像访问测试</h1>
+    
+    <div class="test-section">
+        <h2>1. 原始路径测试</h2>
+        <div class="avatar-container">
+            <img 
+                src="http://localhost:3000/uploads/avatars/avatar_1756687222017_hsnganr3o.png" 
+                alt="原始路径头像"
+                class="user-avatar"
+                onload="logSuccess('原始路径加载成功')"
+                onerror="logError('原始路径加载失败')"
+            />
+            <span>原始路径: /uploads/avatars/</span>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>2. 新路径测试</h2>
+        <div class="avatar-container">
+            <img 
+                src="http://localhost:3000/avatar/avatar_1756687222017_hsnganr3o.png" 
+                alt="新路径头像"
+                class="user-avatar"
+                onload="logSuccess('新路径加载成功')"
+                onerror="logError('新路径加载失败')"
+            />
+            <span>新路径: /avatar/</span>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>3. 动态测试</h2>
+        <button onclick="testAvatarAccess()">测试头像访问</button>
+        <button onclick="clearLog()">清除日志</button>
+        <div id="dynamic-avatar" class="avatar-container">
+            <div style="width: 60px; height: 60px; background: #f0f0f0; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                等待测试
+            </div>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>4. 日志</h2>
+        <div id="log" class="log"></div>
+    </div>
+
+    <script>
+        const logElement = document.getElementById('log');
+        
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = type;
+            logEntry.textContent = `[${timestamp}] ${message}`;
+            logElement.appendChild(logEntry);
+            logElement.scrollTop = logElement.scrollHeight;
+        }
+        
+        function logSuccess(message) {
+            log(message, 'success');
+        }
+        
+        function logError(message) {
+            log(message, 'error');
+        }
+        
+        function clearLog() {
+            logElement.innerHTML = '';
+        }
+        
+        async function testAvatarAccess() {
+            const container = document.getElementById('dynamic-avatar');
+            const avatarUrl = 'http://localhost:3000/uploads/avatars/avatar_1756687222017_hsnganr3o.png';
+            
+            log('开始测试头像访问...');
+            
+            try {
+                // 方法1: 使用fetch
+                log('方法1: 使用fetch测试...');
+                const response = await fetch(avatarUrl, {
+                    method: 'GET',
+                    mode: 'cors'
+                });
+                
+                if (response.ok) {
+                    logSuccess('Fetch测试成功: ' + response.status);
+                    
+                    // 方法2: 使用Image对象
+                    log('方法2: 使用Image对象测试...');
+                    const img = new Image();
+                    img.crossOrigin = 'anonymous';
+                    
+                    img.onload = () => {
+                        logSuccess('Image对象测试成功');
+                        container.innerHTML = `
+                            <img src="${avatarUrl}" alt="动态加载头像" class="user-avatar" />
+                            <span>动态加载成功</span>
+                        `;
+                    };
+                    
+                    img.onerror = () => {
+                        logError('Image对象测试失败');
+                        container.innerHTML = `
+                            <div style="width: 60px; height: 60px; background: #dc3545; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px;">
+                                失败
+                            </div>
+                            <span>动态加载失败</span>
+                        `;
+                    };
+                    
+                    img.src = avatarUrl;
+                    
+                } else {
+                    logError('Fetch测试失败: ' + response.status);
+                }
+                
+            } catch (error) {
+                logError('测试异常: ' + error.message);
+            }
+        }
+        
+        // 页面加载完成后的测试
+        window.addEventListener('load', () => {
+            log('页面加载完成，开始自动测试...');
+            
+            // 延迟测试，确保图片有足够时间加载
+            setTimeout(() => {
+                testAvatarAccess();
+            }, 1000);
+        });
+        
+        // 监听图片加载事件
+        document.addEventListener('DOMContentLoaded', () => {
+            const images = document.querySelectorAll('img');
+            images.forEach((img, index) => {
+                img.addEventListener('load', () => {
+                    logSuccess(`图片 ${index + 1} 加载成功`);
+                });
+                
+                img.addEventListener('error', () => {
+                    logError(`图片 ${index + 1} 加载失败`);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>头像渲染演示</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .demo-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .avatar-container {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            margin: 10px 0;
+        }
+        
+        .user-avatar {
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #e0e0e0;
+            transition: all 0.3s ease;
+        }
+        
+        .user-avatar:hover {
+            border-color: #007bff;
+            transform: scale(1.05);
+        }
+        
+        .avatar-small { width: 32px; height: 32px; }
+        .avatar-medium { width: 48px; height: 48px; }
+        .avatar-large { width: 64px; height: 64px; }
+        .avatar-xl { width: 80px; height: 80px; }
+        
+        .avatar-loading {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 50%;
+        }
+        
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        
+        .code-block {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+        }
+        
+        .success { color: #28a745; }
+        .error { color: #dc3545; }
+        .info { color: #17a2b8; }
+    </style>
+</head>
+<body>
+    <h1>🚀 头像渲染演示</h1>
+    
+    <div class="demo-section">
+        <h2>1. 最简单的方案</h2>
+        <div class="avatar-container">
+            <img 
+                src="http://localhost:3000/uploads/avatars/avatar_1756687222017_hsnganr3o.png" 
+                alt="用户头像"
+                class="user-avatar avatar-medium"
+                onerror="this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=default'"
+            />
+            <span>直接使用 img 标签</span>
+        </div>
+        
+        <div class="code-block">
+&lt;img 
+    src="http://localhost:3000/uploads/avatars/avatar_xxx.png" 
+    alt="用户头像"
+    class="user-avatar"
+    onerror="this.src='默认头像URL'"
+/&gt;
+        </div>
+    </div>
+    
+    <div class="demo-section">
+        <h2>2. 不同尺寸</h2>
+        <div class="avatar-container">
+            <img src="http://localhost:3000/uploads/avatars/avatar_1756687222017_hsnganr3o.png" class="user-avatar avatar-small" onerror="this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=default'" />
+            <span>小尺寸 (32px)</span>
+        </div>
+        <div class="avatar-container">
+            <img src="http://localhost:3000/uploads/avatars/avatar_1756687222017_hsnganr3o.png" class="user-avatar avatar-medium" onerror="this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=default'" />
+            <span>中等尺寸 (48px)</span>
+        </div>
+        <div class="avatar-container">
+            <img src="http://localhost:3000/uploads/avatars/avatar_1756687222017_hsnganr3o.png" class="user-avatar avatar-large" onerror="this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=default'" />
+            <span>大尺寸 (64px)</span>
+        </div>
+        <div class="avatar-container">
+            <img src="http://localhost:3000/uploads/avatars/avatar_1756687222017_hsnganr3o.png" class="user-avatar avatar-xl" onerror="this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=default'" />
+            <span>超大尺寸 (80px)</span>
+        </div>
+    </div>
+    
+    <div class="demo-section">
+        <h2>3. 动态渲染</h2>
+        <div id="dynamic-avatar" class="avatar-container">
+            <div class="avatar-loading avatar-medium"></div>
+            <span>加载中...</span>
+        </div>
+        <button onclick="loadUserInfo()">加载用户信息</button>
+        <button onclick="clearUserInfo()">清除用户信息</button>
+    </div>
+    
+    <div class="demo-section">
+        <h2>4. 错误处理演示</h2>
+        <div class="avatar-container">
+            <img 
+                src="http://localhost:3000/uploads/avatars/nonexistent.png" 
+                alt="不存在的头像"
+                class="user-avatar avatar-medium"
+                onerror="this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=default'"
+            />
+            <span>错误处理 (自动使用默认头像)</span>
+        </div>
+    </div>
+    
+    <div class="demo-section">
+        <h2>5. 状态显示</h2>
+        <div id="status-display">
+            <p class="info">点击上方按钮测试头像加载状态</p>
+        </div>
+    </div>
+
+    <script>
+        // 模拟用户数据
+        const mockUserInfo = {
+            nickName: '张三',
+            avatarUrl: 'http://localhost:3000/uploads/avatars/avatar_1756687222017_hsnganr3o.png'
+        };
+        
+        // 默认头像
+        const defaultAvatar = 'https://api.dicebear.com/7.x/avataaars/svg?seed=default';
+        
+        // 加载用户信息
+        async function loadUserInfo() {
+            const container = document.getElementById('dynamic-avatar');
+            const statusDisplay = document.getElementById('status-display');
+            
+            // 显示加载状态
+            container.innerHTML = `
+                <div class="avatar-loading avatar-medium"></div>
+                <span>加载中...</span>
+            `;
+            statusDisplay.innerHTML = '<p class="info">正在加载用户信息...</p>';
+            
+            try {
+                // 模拟API调用延迟
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                // 预加载头像
+                const avatarUrl = await loadAvatarWithFallback(mockUserInfo.avatarUrl, defaultAvatar);
+                
+                // 更新显示
+                container.innerHTML = `
+                    <img 
+                        src="${avatarUrl}" 
+                        alt="${mockUserInfo.nickName}的头像"
+                        class="user-avatar avatar-medium"
+                        onerror="this.src='${defaultAvatar}'"
+                    />
+                    <span>${mockUserInfo.nickName}</span>
+                `;
+                
+                statusDisplay.innerHTML = '<p class="success">✅ 用户信息加载成功</p>';
+                
+            } catch (error) {
+                container.innerHTML = `
+                    <img 
+                        src="${defaultAvatar}" 
+                        alt="默认头像"
+                        class="user-avatar avatar-medium"
+                    />
+                    <span>加载失败</span>
+                `;
+                statusDisplay.innerHTML = '<p class="error">❌ 用户信息加载失败</p>';
+            }
+        }
+        
+        // 清除用户信息
+        function clearUserInfo() {
+            const container = document.getElementById('dynamic-avatar');
+            const statusDisplay = document.getElementById('status-display');
+            
+            container.innerHTML = `
+                <div class="avatar-loading avatar-medium"></div>
+                <span>加载中...</span>
+            `;
+            statusDisplay.innerHTML = '<p class="info">用户信息已清除</p>';
+        }
+        
+        // 头像加载函数
+        async function loadAvatarWithFallback(avatarUrl, defaultAvatar) {
+            return new Promise((resolve) => {
+                if (!avatarUrl) {
+                    resolve(defaultAvatar);
+                    return;
+                }
+                
+                const img = new Image();
+                img.onload = () => resolve(avatarUrl);
+                img.onerror = () => resolve(defaultAvatar);
+                img.src = avatarUrl;
+            });
+        }
+        
+        // 页面加载完成后自动测试
+        window.addEventListener('load', () => {
+            console.log('🚀 头像渲染演示页面已加载');
+            console.log('📸 测试头像URL:', mockUserInfo.avatarUrl);
+        });
+    </script>
+</body>
+</html>
