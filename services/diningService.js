@@ -177,6 +177,35 @@ class DiningService {
         throw new Error(`用户 ${duplicateMembers.join(', ')} 已经报餐，无法重复报餐`);
       }
       
+      // 6. 获取菜单信息并计算总金额
+      let menuId = null;
+      let totalAmount = 0;
+      try {
+        // 获取当天该餐次的菜单
+        const [menuRows] = await db.execute(
+          `SELECT _id FROM menus 
+           WHERE publishDate = ? AND mealType = ? AND publishStatus = 'published'`,
+          [date, mealType]
+        );
+        
+        if (menuRows.length > 0) {
+          menuId = menuRows[0]._id;
+          // 获取菜单菜品价格
+          const [dishRows] = await db.execute(
+            `SELECT md.price as menuPrice
+             FROM menu_dishes md
+             WHERE md.menuId = ?`,
+            [menuId]
+          );
+          
+          totalAmount = dishRows.reduce((sum, dish) => sum + (parseFloat(dish.menuPrice) || 0), 0);
+        }
+      } catch (error) {
+        logger.warn('获取菜单信息失败，使用默认值:', error);
+        menuId = null;
+        totalAmount = 0;
+      }
+      
       // 7. 创建报餐记录
       const orderId = uuidv4();
       const memberNames = memberRows.map(m => m.nickName);
@@ -184,11 +213,12 @@ class DiningService {
       
       await db.execute(
         `INSERT INTO dining_orders 
-         (_id, deptId, deptName, registrantId, userId, userName, memberIds, memberNames, memberCount, 
-          diningDate, mealType, status, diningStatus, remark, createTime, updateTime)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', 'ordered', ?, ?, ?)`,
+         (_id, menuId, deptId, deptName, registrantId, userId, userName, memberIds, memberNames, memberCount, 
+          diningDate, mealType, status, diningStatus, totalAmount, remark, createTime, updateTime)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', 'ordered', ?, ?, ?, ?)`,
         [
           orderId,
+          menuId, // 菜单ID
           registrant.departmentId,
           registrant.department,
           userId,
@@ -199,6 +229,7 @@ class DiningService {
           memberIds.length,
           date,
           mealType,
+          totalAmount,
           remark || '',
           now, // createTime
           now  // updateTime
