@@ -11,7 +11,7 @@ class DishService {
     let connection;
     
     try {
-      const { page = 1, pageSize = 20, size = pageSize, categoryId, keyword, status, minPrice, maxPrice } = params;
+      const { page = 1, pageSize = 20, size = pageSize, categoryId, keyword, status, minPrice, maxPrice, mealType, isRecommended } = params;
       const offset = (page - 1) * size;
       
       // 构建查询条件
@@ -44,6 +44,18 @@ class DishService {
         queryParams.push(maxPrice);
       }
       
+      // 新增：按餐次类型筛选
+      if (mealType) {
+        whereClause += ' AND JSON_CONTAINS(d.meal_types, JSON_QUOTE(?))';
+        queryParams.push(mealType);
+      }
+      
+      // 新增：按推荐状态筛选
+      if (isRecommended !== undefined) {
+        whereClause += ' AND d.isRecommended = ?';
+        queryParams.push(isRecommended ? 1 : 0);
+      }
+      
       // 查询总数
       const countSql = `
         SELECT COUNT(*) as total 
@@ -68,7 +80,13 @@ class DishService {
           COALESCE(dc.name, '') as categoryName,
           COALESCE(d.image, '') as image,
           COALESCE(d.tags, '[]') as tags,
-          d.status
+          d.status,
+          d.meal_types,
+          d.isRecommended,
+          d.calories,
+          d.protein,
+          d.fat,
+          d.carbohydrate
         FROM dishes d
         LEFT JOIN dish_categories dc ON d.categoryId = dc._id
         ${whereClause}
@@ -85,13 +103,15 @@ class DishService {
         try {
           return {
             ...dish,
-            tags: dish.tags ? JSON.parse(dish.tags) : []
+            tags: dish.tags ? (typeof dish.tags === 'string' ? JSON.parse(dish.tags) : dish.tags) : [],
+            meal_types: dish.meal_types ? (typeof dish.meal_types === 'string' ? JSON.parse(dish.meal_types) : dish.meal_types) : ['breakfast', 'lunch', 'dinner']
           };
         } catch (parseError) {
-          logger.warn('解析菜品tags失败:', parseError.message, '原始数据:', dish.tags);
+          logger.warn('解析菜品数据失败:', parseError.message, '原始数据:', dish);
           return {
             ...dish,
-            tags: []
+            tags: [],
+            meal_types: ['breakfast', 'lunch', 'dinner']
           };
         }
       });
@@ -244,13 +264,16 @@ class DishService {
         carbohydrate: (value) => value !== undefined ? value : null,
         tags: (value) => value ? JSON.stringify(value) : '[]',
         status: (value) => value || 'active',
-        isRecommended: (value) => value ? 1 : 0
+        isRecommended: (value) => value ? 1 : 0,
+        mealTypes: (value) => value ? JSON.stringify(value) : JSON.stringify(['breakfast', 'lunch', 'dinner'])
       };
       
       // 只更新提供的字段
       Object.keys(fieldMappings).forEach(field => {
         if (dishData[field] !== undefined) {
-          updateFields.push(`${field} = ?`);
+          // 特殊处理 mealTypes 字段，映射到数据库的 meal_types 列
+          const dbField = field === 'mealTypes' ? 'meal_types' : field;
+          updateFields.push(`${dbField} = ?`);
           updateValues.push(fieldMappings[field](dishData[field]));
         }
       });

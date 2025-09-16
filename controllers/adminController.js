@@ -660,13 +660,20 @@ const deleteDepartment = async (req, res) => {
  */
 const getDishes = async (req, res) => {
   try {
-    const { page = 1, pageSize = 20, keyword, categoryId, status } = req.query;
+    console.log('🚀 adminController.getDishes 被调用');
+    console.log('📋 请求参数:', req.query);
+    
+    const { page = 1, pageSize = 20, keyword, categoryId, status, mealType, isRecommended } = req.query;
     
     const filters = {
       keyword,
       categoryId,
-      status
+      status,
+      mealType,
+      isRecommended: isRecommended !== undefined ? isRecommended === 'true' : undefined
     };
+    
+    console.log('🔧 处理后的filters:', filters);
     
     const result = await adminService.getDishes(req.db, {
       page: parseInt(page),
@@ -674,10 +681,51 @@ const getDishes = async (req, res) => {
       filters
     });
     
+    console.log('✅ adminService.getDishes 返回结果数量:', result.list.length);
+    
     ResponseHelper.success(res, result, '获取菜品列表成功');
   } catch (error) {
     logger.error('获取菜品列表失败:', error);
     ResponseHelper.error(res, '获取菜品列表失败', 500);
+  }
+};
+
+/**
+ * 按餐次类型获取菜品列表
+ */
+const getDishesByMealType = async (req, res) => {
+  try {
+    const { mealType } = req.params;
+    const { page = 1, pageSize = 20, keyword, categoryId, isRecommended } = req.query;
+    
+    // 验证餐次类型
+    if (!['breakfast', 'lunch', 'dinner'].includes(mealType)) {
+      return ResponseHelper.error(res, '无效的餐次类型', 400);
+    }
+    
+    const filters = {
+      keyword,
+      categoryId,
+      isRecommended: isRecommended !== undefined ? isRecommended === 'true' : undefined
+    };
+    
+    const result = await adminService.getDishesByMealType(req.db, {
+      mealType,
+      page: parseInt(page),
+      pageSize: parseInt(pageSize),
+      filters
+    });
+    
+    const mealTypeNames = {
+      breakfast: '早餐',
+      lunch: '午餐',
+      dinner: '晚餐'
+    };
+    
+    ResponseHelper.success(res, result, `获取${mealTypeNames[mealType]}菜品列表成功`);
+  } catch (error) {
+    logger.error('获取餐次菜品列表失败:', error);
+    ResponseHelper.error(res, error.message || '获取餐次菜品列表失败', 500);
   }
 };
 
@@ -1213,6 +1261,19 @@ const createNotice = async (req, res) => {
       publisherName: req.user.nickName || req.user.realName
     };
     
+    // 处理日期字段转换
+    if (noticeData.startDate && !noticeData.startTime) {
+      // 将 startDate 转换为 startTime，设置为当天 00:00:00
+      noticeData.startTime = new Date(noticeData.startDate + 'T00:00:00.000Z').toISOString();
+      delete noticeData.startDate;
+    }
+    
+    if (noticeData.endDate && !noticeData.endTime) {
+      // 将 endDate 转换为 endTime，设置为当天 23:59:59
+      noticeData.endTime = new Date(noticeData.endDate + 'T23:59:59.999Z').toISOString();
+      delete noticeData.endDate;
+    }
+    
     const notice = await adminService.createNotice(noticeData, req.db);
     
     ResponseHelper.success(res, notice, '公告创建成功');
@@ -1229,6 +1290,19 @@ const updateNotice = async (req, res) => {
   try {
     const { noticeId } = req.params;
     const updateData = req.body;
+    
+    // 处理日期字段转换
+    if (updateData.startDate && !updateData.startTime) {
+      // 将 startDate 转换为 startTime，设置为当天 00:00:00
+      updateData.startTime = new Date(updateData.startDate + 'T00:00:00.000Z').toISOString();
+      delete updateData.startDate;
+    }
+    
+    if (updateData.endDate && !updateData.endTime) {
+      // 将 endDate 转换为 endTime，设置为当天 23:59:59
+      updateData.endTime = new Date(updateData.endDate + 'T23:59:59.999Z').toISOString();
+      delete updateData.endDate;
+    }
     
     const notice = await adminService.updateNotice(noticeId, updateData, req.user.id, req.db);
     
@@ -1373,6 +1447,7 @@ module.exports = {
   
   // 菜品管理模块
   getDishes,
+  getDishesByMealType,
   createDish,
   updateDish,
   updateDishStatus,

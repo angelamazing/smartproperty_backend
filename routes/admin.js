@@ -430,8 +430,24 @@ router.get('/dishes', [
   query('keyword').optional().isLength({ max: 50 }).withMessage('关键词长度不能超过50字符'),
   query('categoryId').optional().isLength({ max: 36 }).withMessage('分类ID格式无效'),
   query('status').optional().isIn(['active', 'inactive']).withMessage('状态无效'),
+  query('mealType').optional().isIn(['breakfast', 'lunch', 'dinner']).withMessage('餐次类型无效'),
   validate
 ], adminController.getDishes);
+
+/**
+ * @route GET /api/admin/dishes/meal/:mealType
+ * @desc 按餐次类型获取菜品列表
+ * @access Admin
+ */
+router.get('/dishes/meal/:mealType', [
+  param('mealType').isIn(['breakfast', 'lunch', 'dinner']).withMessage('餐次类型无效'),
+  query('page').optional().isInt({ min: 1 }).withMessage('页码必须大于0'),
+  query('pageSize').optional().isInt({ min: 1, max: 100 }).withMessage('每页数量必须在1-100之间'),
+  query('keyword').optional().isLength({ max: 50 }).withMessage('关键词长度不能超过50字符'),
+  query('categoryId').optional().isLength({ max: 36 }).withMessage('分类ID格式无效'),
+  query('isRecommended').optional().isBoolean().withMessage('推荐标志必须是布尔值'),
+  validate
+], adminController.getDishesByMealType);
 
 /**
  * @route POST /api/admin/dishes
@@ -451,6 +467,8 @@ router.post('/dishes', [
   body('tags').optional().isArray().withMessage('标签必须是数组'),
   body('status').optional().isIn(['active', 'inactive']).withMessage('状态无效'),
   body('isRecommended').optional().isBoolean().withMessage('推荐标志必须是布尔值'),
+  body('mealTypes').optional().isArray().withMessage('餐次类型必须是数组'),
+  body('mealTypes.*').optional().isIn(['breakfast', 'lunch', 'dinner']).withMessage('餐次类型值无效'),
   validate
 ], adminController.createDish);
 
@@ -473,6 +491,8 @@ router.put('/dishes/:dishId', [
   body('tags').optional().isArray().withMessage('标签必须是数组'),
   body('status').optional().isIn(['active', 'inactive']).withMessage('状态无效'),
   body('isRecommended').optional().isBoolean().withMessage('推荐标志必须是布尔值'),
+  body('mealTypes').optional().isArray().withMessage('餐次类型必须是数组'),
+  body('mealTypes.*').optional().isIn(['breakfast', 'lunch', 'dinner']).withMessage('餐次类型值无效'),
   validate
 ], adminController.updateDish);
 
@@ -803,6 +823,8 @@ router.post('/notices', [
   body('status').optional().isIn(['draft', 'published', 'archived']).withMessage('状态无效'),
   body('startTime').optional().isISO8601().withMessage('开始时间格式无效'),
   body('endTime').optional().isISO8601().withMessage('结束时间格式无效'),
+  body('startDate').optional().isDate().withMessage('开始日期格式无效，请使用YYYY-MM-DD格式'),
+  body('endDate').optional().isDate().withMessage('结束日期格式无效，请使用YYYY-MM-DD格式'),
   body('isSticky').optional().isBoolean().withMessage('置顶状态无效'),
   body('targetUsers').optional().isArray().withMessage('目标用户必须是数组'),
   validate
@@ -822,6 +844,8 @@ router.put('/notices/:noticeId', [
   body('status').optional().isIn(['draft', 'published', 'archived']).withMessage('状态无效'),
   body('startTime').optional().isISO8601().withMessage('开始时间格式无效'),
   body('endTime').optional().isISO8601().withMessage('结束时间格式无效'),
+  body('startDate').optional().isDate().withMessage('开始日期格式无效，请使用YYYY-MM-DD格式'),
+  body('endDate').optional().isDate().withMessage('结束日期格式无效，请使用YYYY-MM-DD格式'),
   body('isSticky').optional().isBoolean().withMessage('置顶状态无效'),
   body('targetUsers').optional().isArray().withMessage('目标用户必须是数组'),
   validate

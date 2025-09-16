@@ -28,6 +28,9 @@ const departmentRoutes = require('./routes/department');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// 设置信任代理 - 仅信任本地代理，提高安全性
+app.set('trust proxy', 1);
+
 // 设置服务器超时配置
 app.use((req, res, next) => {
   // 设置请求超时为30秒
@@ -131,11 +134,22 @@ app.use('/public', express.static(path.join(__dirname, 'public'), {
 // 速率限制中间件
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15分钟
-  max: 200, // 限制每个IP在窗口时间内最多100次请求
+  max: 200, // 限制每个IP在窗口时间内最多200次请求
   message: {
     success: false,
     message: '请求过于频繁，请稍后再试',
     error: '请求频率超限'
+  },
+  standardHeaders: true, // 返回速率限制信息在 `RateLimit-*` 头中
+  legacyHeaders: false, // 禁用 `X-RateLimit-*` 头
+  // 自定义键生成器，确保IP获取的准确性
+  keyGenerator: (req) => {
+    // 优先使用 X-Forwarded-For 头，但仅信任第一个代理
+    const forwarded = req.get('X-Forwarded-For');
+    if (forwarded) {
+      return forwarded.split(',')[0].trim();
+    }
+    return req.ip;
   }
 });
 app.use(limiter);

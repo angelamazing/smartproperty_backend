@@ -16,7 +16,7 @@ const dishService = require('../services/dishService');
 router.get('/', 
   async (req, res) => {
     try {
-      const { page = 1, size = 20, categoryId, keyword, status, minPrice, maxPrice } = req.query;
+      const { page = 1, size = 20, categoryId, keyword, status, minPrice, maxPrice, mealType, isRecommended } = req.query;
       
       const params = {
         page: parseInt(page),
@@ -25,7 +25,9 @@ router.get('/',
         keyword,
         status,
         minPrice: minPrice ? parseFloat(minPrice) : undefined,
-        maxPrice: maxPrice ? parseFloat(maxPrice) : undefined
+        maxPrice: maxPrice ? parseFloat(maxPrice) : undefined,
+        mealType,
+        isRecommended: isRecommended !== undefined ? isRecommended === 'true' : undefined
       };
       
       const dishes = await dishService.getDishList(req.db, params);

@@ -1606,6 +1606,8 @@ const deleteDepartment = async (db, deptId) => {
  */
 const getDishes = async (db, { page, pageSize, filters }) => {
   try {
+    console.log('🔍 getDishes 调用参数:', { page, pageSize, filters });
+    
     let whereClause = 'WHERE d.status != "deleted"';
     const params = [];
     
@@ -1623,6 +1625,23 @@ const getDishes = async (db, { page, pageSize, filters }) => {
       whereClause += ' AND d.status = ?';
       params.push(filters.status);
     }
+    
+    // 新增：按餐次类型筛选
+    if (filters.mealType) {
+      console.log('📍 添加 mealType 筛选:', filters.mealType);
+      whereClause += ' AND JSON_CONTAINS(d.meal_types, JSON_QUOTE(?))';
+      params.push(filters.mealType);
+    }
+    
+    // 新增：按推荐状态筛选
+    if (filters.isRecommended !== undefined) {
+      console.log('📍 添加 isRecommended 筛选:', filters.isRecommended);
+      whereClause += ' AND d.isRecommended = ?';
+      params.push(filters.isRecommended ? 1 : 0);
+    }
+    
+    console.log('📝 最终 SQL 条件:', whereClause);
+    console.log('📝 SQL 参数:', params);
     
     // 获取总数
     const [countResult] = await db.execute(
@@ -1661,7 +1680,8 @@ const createDish = async (db, dishData) => {
   try {
     const {
       name, categoryId, description, price, image, calories, protein,
-      fat, carbohydrate, tags = [], status = 'active', isRecommended = false, createBy
+      fat, carbohydrate, tags = [], status = 'active', isRecommended = false, 
+      mealTypes = ['breakfast', 'lunch', 'dinner'], createBy
     } = dishData;
     
     const dishId = uuidv4();
@@ -1678,8 +1698,8 @@ const createDish = async (db, dishData) => {
     await db.execute(
       `INSERT INTO dishes (
         _id, name, categoryId, description, price, image, calories, protein,
-        fat, carbohydrate, tags, status, isRecommended, createTime, createBy
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?)`,
+        fat, carbohydrate, tags, status, isRecommended, meal_types, createTime, createBy
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?)`,
       [
         dishId, 
         name, 
@@ -1693,12 +1713,13 @@ const createDish = async (db, dishData) => {
         safeCarbohydrate, 
         JSON.stringify(tags), 
         status, 
-        isRecommended ? 1 : 0, 
+        isRecommended ? 1 : 0,
+        JSON.stringify(mealTypes),
         safeCreateBy
       ]
     );
     
-    return { id: dishId, name, price: price || 0, status };
+    return { id: dishId, name, price: price || 0, status, mealTypes };
   } catch (error) {
     throw new Error(`创建菜品失败: ${error.message}`);
   }
@@ -1714,18 +1735,24 @@ const updateDish = async (db, dishId, dishData) => {
     
     const allowedFields = [
       'name', 'categoryId', 'description', 'price', 'image', 'calories',
-      'protein', 'fat', 'carbohydrate', 'status', 'isRecommended'
+      'protein', 'fat', 'carbohydrate', 'status', 'isRecommended', 'mealTypes'
     ];
     
     allowedFields.forEach(field => {
       if (dishData[field] !== undefined) {
-        updateFields.push(`${field} = ?`);
+        // 特殊处理 mealTypes 字段，映射到数据库的 meal_types 列
+        const dbField = field === 'mealTypes' ? 'meal_types' : field;
+        updateFields.push(`${dbField} = ?`);
+        
         // 处理 undefined 值，转换为 null
         let value = dishData[field];
         if (value === undefined) {
           value = null;
         } else if (field === 'isRecommended') {
           value = value ? 1 : 0;
+        } else if (field === 'mealTypes') {
+          // mealTypes 需要序列化为 JSON
+          value = JSON.stringify(value);
         }
         updateValues.push(value);
       }
@@ -1741,8 +1768,10 @@ const updateDish = async (db, dishId, dishData) => {
     }
     
     updateFields.push('updateTime = NOW()');
-    updateFields.push('updateBy = ?');
-    updateValues.push(dishData.updateBy);
+    if (dishData.updateBy) {
+      updateFields.push('createBy = ?');
+      updateValues.push(dishData.updateBy);
+    }
     updateValues.push(dishId);
     
     const [result] = await db.execute(
@@ -1775,6 +1804,67 @@ const updateDishStatus = async (db, dishId, status) => {
     }
   } catch (error) {
     throw new Error(`更新菜品状态失败: ${error.message}`);
+  }
+};
+
+/**
+ * 按餐次类型获取菜品列表
+ */
+const getDishesByMealType = async (db, { mealType, page = 1, pageSize = 20, filters = {} }) => {
+  try {
+    let whereClause = 'WHERE d.status = "active"';
+    const params = [];
+    
+    // 按餐次类型筛选
+    if (mealType) {
+      whereClause += ' AND JSON_CONTAINS(d.meal_types, ?)';
+      params.push(`"${mealType}"`);
+    }
+    
+    // 其他筛选条件
+    if (filters.keyword) {
+      whereClause += ' AND d.name LIKE ?';
+      params.push(`%${filters.keyword}%`);
+    }
+    
+    if (filters.categoryId) {
+      whereClause += ' AND d.categoryId = ?';
+      params.push(filters.categoryId);
+    }
+    
+    if (filters.isRecommended !== undefined) {
+      whereClause += ' AND d.isRecommended = ?';
+      params.push(filters.isRecommended ? 1 : 0);
+    }
+    
+    // 获取总数
+    const [countResult] = await db.execute(
+      `SELECT COUNT(*) as total FROM dishes d ${whereClause}`,
+      params
+    );
+    const total = countResult[0].total;
+    
+    // 获取分页数据
+    const offset = (page - 1) * pageSize;
+    const [dishes] = await db.execute(
+      `SELECT d.*, dc.name as category_name 
+       FROM dishes d 
+       LEFT JOIN dish_categories dc ON d.categoryId = dc._id 
+       ${whereClause} 
+       ORDER BY d.isRecommended DESC, d.createTime DESC 
+       LIMIT ${parseInt(pageSize)} OFFSET ${parseInt(offset)}`
+    );
+    
+    return {
+      list: dishes,
+      total,
+      page,
+      pageSize,
+      totalPages: Math.ceil(total / pageSize),
+      mealType
+    };
+  } catch (error) {
+    throw new Error(`获取${mealType}菜品列表失败: ${error.message}`);
   }
 };
 
@@ -2805,6 +2895,7 @@ module.exports = {
   
   // 菜品管理模块
   getDishes,
+  getDishesByMealType,
   createDish,
   updateDish,
   updateDishStatus,
