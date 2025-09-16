@@ -146,7 +146,7 @@ class TotalAmountTest {
       console.log('\n🔍 测试个人报餐状态API...');
       
       // 模拟API调用 - 直接调用服务方法
-      const { DiningService } = require('./services/diningService');
+      const { DiningService } = require('../services/diningService');
       const diningService = new DiningService();
       
       // 使用一个测试用户ID

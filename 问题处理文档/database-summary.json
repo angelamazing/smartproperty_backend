@@ -1,0 +1,1965 @@
+{
+  "database": {
+    "name": "smart_property",
+    "charset": "utf8mb4",
+    "collation": "utf8mb4_unicode_ci",
+    "exportTime": "2025-09-14T01:50:22.088Z",
+    "exportVersion": "1.0.0"
+  },
+  "tables": {
+    "activity_logs": {
+      "comment": "活动日志表",
+      "engine": "InnoDB",
+      "fieldCount": 14,
+      "primaryKeys": [
+        "_id"
+      ],
+      "indexes": [
+        {
+          "name": "PRIMARY",
+          "unique": true,
+          "columns": [
+            "_id"
+          ]
+        },
+        {
+          "name": "idx_user",
+          "unique": false,
+          "columns": [
+            "userId"
+          ]
+        },
+        {
+          "name": "idx_action",
+          "unique": false,
+          "columns": [
+            "action"
+          ]
+        },
+        {
+          "name": "idx_module",
+          "unique": false,
+          "columns": [
+            "module"
+          ]
+        },
+        {
+          "name": "idx_resource",
+          "unique": false,
+          "columns": [
+            "resourceType",
+            "resourceId"
+          ]
+        },
+        {
+          "name": "idx_status",
+          "unique": false,
+          "columns": [
+            "status"
+          ]
+        },
+        {
+          "name": "idx_create_time",
+          "unique": false,
+          "columns": [
+            "createTime"
+          ]
+        },
+        {
+          "name": "idx_ip_address",
+          "unique": false,
+          "columns": [
+            "ipAddress"
+          ]
+        }
+      ],
+      "foreignKeys": [
+        {
+          "column": "userId",
+          "references": "users._id"
+        }
+      ]
+    },
+    "departments": {
+      "comment": "部门表",
+      "engine": "InnoDB",
+      "fieldCount": 11,
+      "primaryKeys": [
+        "_id"
+      ],
+      "indexes": [
+        {
+          "name": "PRIMARY",
+          "unique": true,
+          "columns": [
+            "_id"
+          ]
+        },
+        {
+          "name": "code",
+          "unique": true,
+          "columns": [
+            "code"
+          ]
+        },
+        {
+          "name": "idx_name",
+          "unique": false,
+          "columns": [
+            "name"
+          ]
+        },
+        {
+          "name": "idx_code",
+          "unique": false,
+          "columns": [
+            "code"
+          ]
+        },
+        {
+          "name": "idx_parent",
+          "unique": false,
+          "columns": [
+            "parentId"
+          ]
+        },
+        {
+          "name": "idx_level",
+          "unique": false,
+          "columns": [
+            "level"
+          ]
+        },
+        {
+          "name": "idx_manager",
+          "unique": false,
+          "columns": [
+            "managerId"
+          ]
+        },
+        {
+          "name": "idx_status",
+          "unique": false,
+          "columns": [
+            "status"
+          ]
+        },
+        {
+          "name": "idx_sort",
+          "unique": false,
+          "columns": [
+            "sort"
+          ]
+        }
+      ],
+      "foreignKeys": [
+        {
+          "column": "parentId",
+          "references": "departments._id"
+        }
+      ]
+    },
+    "dining_confirmation_logs": {
+      "comment": "就餐确认日志表",
+      "engine": "InnoDB",
+      "fieldCount": 9,
+      "primaryKeys": [
+        "_id"
+      ],
+      "indexes": [
+        {
+          "name": "PRIMARY",
+          "unique": true,
+          "columns": [
+            "_id"
+          ]
+        },
+        {
+          "name": "idx_order_id",
+          "unique": false,
+          "columns": [
+            "orderId"
+          ]
+        },
+        {
+          "name": "idx_user_id",
+          "unique": false,
+          "columns": [
+            "userId"
+          ]
+        },
+        {
+          "name": "idx_confirmation_time",
+          "unique": false,
+          "columns": [
+            "confirmationTime"
+          ]
+        },
+        {
+          "name": "idx_confirmation_type",
+          "unique": false,
+          "columns": [
+            "confirmationType"
+          ]
+        },
+        {
+          "name": "confirmedBy",
+          "unique": false,
+          "columns": [
+            "confirmedBy"
+          ]
+        }
+      ],
+      "foreignKeys": [
+        {
+          "column": "orderId",
+          "references": "dining_orders._id"
+        },
+        {
+          "column": "userId",
+          "references": "users._id"
+        },
+        {
+          "column": "confirmedBy",
+          "references": "users._id"
+        }
+      ]
+    },
+    "dining_orders": {
+      "comment": "日常报餐记录表",
+      "engine": "InnoDB",
+      "fieldCount": 22,
+      "primaryKeys": [
+        "_id"
+      ],
+      "indexes": [
+        {
+          "name": "PRIMARY",
+          "unique": true,
+          "columns": [
+            "_id"
+          ]
+        },
+        {
+          "name": "idx_menu",
+          "unique": false,
+          "columns": [
+            "menuId"
+          ]
+        },
+        {
+          "name": "idx_registrant",
+          "unique": false,
+          "columns": [
+            "registrantId"
+          ]
+        },
+        {
+          "name": "idx_dining_date",
+          "unique": false,
+          "columns": [
+            "diningDate"
+          ]
+        },
+        {
+          "name": "idx_meal_type",
+          "unique": false,
+          "columns": [
+            "mealType"
+          ]
+        },
+        {
+          "name": "idx_status",
+          "unique": false,
+          "columns": [
+            "status"
+          ]
+        },
+        {
+          "name": "idx_dept",
+          "unique": false,
+          "columns": [
+            "deptId"
+          ]
+        },
+        {
+          "name": "idx_confirm_time",
+          "unique": false,
+          "columns": [
+            "confirmTime"
+          ]
+        },
+        {
+          "name": "idx_create_time",
+          "unique": false,
+          "columns": [
+            "createTime"
+          ]
+        },
+        {
+          "name": "confirmedBy",
+          "unique": false,
+          "columns": [
+            "confirmedBy"
+          ]
+        },
+        {
+          "name": "idx_dining_status",
+          "unique": false,
+          "columns": [
+            "diningStatus"
+          ]
+        },
+        {
+          "name": "idx_actual_dining_time",
+          "unique": false,
+          "columns": [
+            "actualDiningTime"
+          ]
+        }
+      ],
+      "foreignKeys": [
+        {
+          "column": "menuId",
+          "references": "menus._id"
+        },
+        {
+          "column": "registrantId",
+          "references": "users._id"
+        },
+        {
+          "column": "deptId",
+          "references": "departments._id"
+        },
+        {
+          "column": "confirmedBy",
+          "references": "users._id"
+        }
+      ]
+    },
+    "dining_registrations": {
+      "comment": "就餐登记表",
+      "engine": "InnoDB",
+      "fieldCount": 12,
+      "primaryKeys": [
+        "_id"
+      ],
+      "indexes": [
+        {
+          "name": "PRIMARY",
+          "unique": true,
+          "columns": [
+            "_id"
+          ]
+        },
+        {
+          "name": "uk_user_date_meal",
+          "unique": true,
+          "columns": [
+            "userId",
+            "diningDate",
+            "mealType"
+          ]
+        },
+        {
+          "name": "idx_user",
+          "unique": false,
+          "columns": [
+            "userId"
+          ]
+        },
+        {
+          "name": "idx_qr_code",
+          "unique": false,
+          "columns": [
+            "qrCodeId"
+          ]
+        },
+        {
+          "name": "idx_scan_time",
+          "unique": false,
+          "columns": [
+            "scanTime"
+          ]
+        },
+        {
+          "name": "idx_dining_date",
+          "unique": false,
+          "columns": [
+            "diningDate"
+          ]
+        },
+        {
+          "name": "idx_meal_type",
+          "unique": false,
+          "columns": [
+            "mealType"
+          ]
+        },
+        {
+          "name": "idx_order",
+          "unique": false,
+          "columns": [
+            "orderId"
+          ]
+        },
+        {
+          "name": "idx_status",
+          "unique": false,
+          "columns": [
+            "status"
+          ]
+        },
+        {
+          "name": "idx_create_time",
+          "unique": false,
+          "columns": [
+            "createTime"
+          ]
+        }
+      ],
+      "foreignKeys": [
+        {
+          "column": "userId",
+          "references": "users._id"
+        },
+        {
+          "column": "qrCodeId",
+          "references": "qr_codes._id"
+        },
+        {
+          "column": "orderId",
+          "references": "dining_orders._id"
+        }
+      ]
+    },
+    "dining_tables": {
+      "comment": "餐桌表",
+      "engine": "InnoDB",
+      "fieldCount": 12,
+      "primaryKeys": [
+        "_id"
+      ],
+      "indexes": [
+        {
+          "name": "PRIMARY",
+          "unique": true,
+          "columns": [
+            "_id"
+          ]
+        },
+        {
+          "name": "tableNumber",
+          "unique": true,
+          "columns": [
+            "tableNumber"
+          ]
+        },
+        {
+          "name": "qrCode",
+          "unique": true,
+          "columns": [
+            "qrCode"
+          ]
+        },
+        {
+          "name": "verificationCode",
+          "unique": true,
+          "columns": [
+            "verificationCode"
+          ]
+        },
+        {
+          "name": "idx_table_name",
+          "unique": false,
+          "columns": [
+            "tableName"
+          ]
+        },
+        {
+          "name": "idx_table_number",
+          "unique": false,
+          "columns": [
+            "tableNumber"
+          ]
+        },
+        {
+          "name": "idx_location",
+          "unique": false,
+          "columns": [
+            "location"
+          ]
+        },
+        {
+          "name": "idx_capacity",
+          "unique": false,
+          "columns": [
+            "maxCapacity",
+            "currentPeople"
+          ]
+        },
+        {
+          "name": "idx_qr_code",
+          "unique": false,
+          "columns": [
+            "qrCode"
+          ]
+        },
+        {
+          "name": "idx_verification_code",
+          "unique": false,
+          "columns": [
+            "verificationCode"
+          ]
+        },
+        {
+          "name": "idx_status",
+          "unique": false,
+          "columns": [
+            "status"
+          ]
+        },
+        {
+          "name": "idx_last_verification",
+          "unique": false,
+          "columns": [
+            "lastVerificationTime"
+          ]
+        }
+      ],
+      "foreignKeys": []
+    },
+    "dining_verifications": {
+      "comment": "用餐验证记录表",
+      "engine": "InnoDB",
+      "fieldCount": 15,
+      "primaryKeys": [
+        "_id"
+      ],
+      "indexes": [
+        {
+          "name": "PRIMARY",
+          "unique": true,
+          "columns": [
+            "_id"
+          ]
+        },
+        {
+          "name": "idx_user",
+          "unique": false,
+          "columns": [
+            "userId"
+          ]
+        },
+        {
+          "name": "idx_table",
+          "unique": false,
+          "columns": [
+            "tableId"
+          ]
+        },
+        {
+          "name": "idx_order",
+          "unique": false,
+          "columns": [
+            "orderId"
+          ]
+        },
+        {
+          "name": "idx_dining_date",
+          "unique": false,
+          "columns": [
+            "diningDate"
+          ]
+        },
+        {
+          "name": "idx_meal_type",
+          "unique": false,
+          "columns": [
+            "mealType"
+          ]
+        },
+        {
+          "name": "idx_verification_time",
+          "unique": false,
+          "columns": [
+            "verificationTime"
+          ]
+        },
+        {
+          "name": "idx_verifier",
+          "unique": false,
+          "columns": [
+            "verifierId"
+          ]
+        },
+        {
+          "name": "idx_status",
+          "unique": false,
+          "columns": [
+            "status"
+          ]
+        }
+      ],
+      "foreignKeys": [
+        {
+          "column": "userId",
+          "references": "users._id"
+        },
+        {
+          "column": "tableId",
+          "references": "dining_tables._id"
+        },
+        {
+          "column": "orderId",
+          "references": "dining_orders._id"
+        },
+        {
+          "column": "verifierId",
+          "references": "users._id"
+        }
+      ]
+    },
+    "dish_categories": {
+      "comment": "菜品分类表",
+      "engine": "InnoDB",
+      "fieldCount": 10,
+      "primaryKeys": [
+        "_id"
+      ],
+      "indexes": [
+        {
+          "name": "PRIMARY",
+          "unique": true,
+          "columns": [
+            "_id"
+          ]
+        },
+        {
+          "name": "idx_name",
+          "unique": false,
+          "columns": [
+            "name"
+          ]
+        },
+        {
+          "name": "idx_status",
+          "unique": false,
+          "columns": [
+            "status"
+          ]
+        },
+        {
+          "name": "idx_sort",
+          "unique": false,
+          "columns": [
+            "sort"
+          ]
+        },
+        {
+          "name": "idx_create_time",
+          "unique": false,
+          "columns": [
+            "createTime"
+          ]
+        }
+      ],
+      "foreignKeys": []
+    },
+    "dishes": {
+      "comment": "菜品表",
+      "engine": "InnoDB",
+      "fieldCount": 16,
+      "primaryKeys": [
+        "_id"
+      ],
+      "indexes": [
+        {
+          "name": "PRIMARY",
+          "unique": true,
+          "columns": [
+            "_id"
+          ]
+        },
+        {
+          "name": "idx_name",
+          "unique": false,
+          "columns": [
+            "name"
+          ]
+        },
+        {
+          "name": "idx_category",
+          "unique": false,
+          "columns": [
+            "categoryId"
+          ]
+        },
+        {
+          "name": "idx_status",
+          "unique": false,
+          "columns": [
+            "status"
+          ]
+        },
+        {
+          "name": "idx_price",
+          "unique": false,
+          "columns": [
+            "price"
+          ]
+        },
+        {
+          "name": "idx_create_time",
+          "unique": false,
+          "columns": [
+            "createTime"
+          ]
+        }
+      ],
+      "foreignKeys": [
+        {
+          "column": "categoryId",
+          "references": "dish_categories._id"
+        }
+      ]
+    },
+    "file_uploads": {
+      "comment": "文件上传表",
+      "engine": "InnoDB",
+      "fieldCount": 14,
+      "primaryKeys": [
+        "_id"
+      ],
+      "indexes": [
+        {
+          "name": "PRIMARY",
+          "unique": true,
+          "columns": [
+            "_id"
+          ]
+        },
+        {
+          "name": "idx_uploader",
+          "unique": false,
+          "columns": [
+            "uploaderId"
+          ]
+        },
+        {
+          "name": "idx_category",
+          "unique": false,
+          "columns": [
+            "category"
+          ]
+        },
+        {
+          "name": "idx_status",
+          "unique": false,
+          "columns": [
+            "status"
+          ]
+        },
+        {
+          "name": "idx_file_hash",
+          "unique": false,
+          "columns": [
+            "fileHash"
+          ]
+        },
+        {
+          "name": "idx_create_time",
+          "unique": false,
+          "columns": [
+            "createTime"
+          ]
+        }
+      ],
+      "foreignKeys": [
+        {
+          "column": "uploaderId",
+          "references": "users._id"
+        }
+      ]
+    },
+    "menu_dishes": {
+      "comment": "菜单菜品关联表",
+      "engine": "InnoDB",
+      "fieldCount": 6,
+      "primaryKeys": [
+        "_id"
+      ],
+      "indexes": [
+        {
+          "name": "PRIMARY",
+          "unique": true,
+          "columns": [
+            "_id"
+          ]
+        },
+        {
+          "name": "idx_menu_id",
+          "unique": false,
+          "columns": [
+            "menuId"
+          ]
+        },
+        {
+          "name": "idx_dish_id",
+          "unique": false,
+          "columns": [
+            "dishId"
+          ]
+        }
+      ],
+      "foreignKeys": [
+        {
+          "column": "menuId",
+          "references": "menus._id"
+        },
+        {
+          "column": "dishId",
+          "references": "dishes._id"
+        }
+      ]
+    },
+    "menus": {
+      "comment": "菜单表",
+      "engine": "InnoDB",
+      "fieldCount": 15,
+      "primaryKeys": [
+        "_id"
+      ],
+      "indexes": [
+        {
+          "name": "PRIMARY",
+          "unique": true,
+          "columns": [
+            "_id"
+          ]
+        },
+        {
+          "name": "uk_date_meal",
+          "unique": true,
+          "columns": [
+            "publishDate",
+            "mealType"
+          ]
+        },
+        {
+          "name": "idx_publish_date",
+          "unique": false,
+          "columns": [
+            "publishDate"
+          ]
+        },
+        {
+          "name": "idx_meal_type",
+          "unique": false,
+          "columns": [
+            "mealType"
+          ]
+        },
+        {
+          "name": "idx_status",
+          "unique": false,
+          "columns": [
+            "publishStatus"
+          ]
+        },
+        {
+          "name": "idx_publisher",
+          "unique": false,
+          "columns": [
+            "publisherId"
+          ]
+        },
+        {
+          "name": "idx_capacity",
+          "unique": false,
+          "columns": [
+            "capacity",
+            "currentOrders"
+          ]
+        }
+      ],
+      "foreignKeys": [
+        {
+          "column": "publisherId",
+          "references": "users._id"
+        }
+      ]
+    },
+    "nutrition_templates": {
+      "comment": "营养模板表",
+      "engine": "InnoDB",
+      "fieldCount": 11,
+      "primaryKeys": [
+        "_id"
+      ],
+      "indexes": [
+        {
+          "name": "PRIMARY",
+          "unique": true,
+          "columns": [
+            "_id"
+          ]
+        },
+        {
+          "name": "idx_name",
+          "unique": false,
+          "columns": [
+            "name"
+          ]
+        },
+        {
+          "name": "idx_status",
+          "unique": false,
+          "columns": [
+            "status"
+          ]
+        },
+        {
+          "name": "idx_create_time",
+          "unique": false,
+          "columns": [
+            "createTime"
+          ]
+        }
+      ],
+      "foreignKeys": []
+    },
+    "permissions": {
+      "comment": "权限表",
+      "engine": "InnoDB",
+      "fieldCount": 7,
+      "primaryKeys": [
+        "_id"
+      ],
+      "indexes": [
+        {
+          "name": "PRIMARY",
+          "unique": true,
+          "columns": [
+            "_id"
+          ]
+        },
+        {
+          "name": "uk_code",
+          "unique": true,
+          "columns": [
+            "code"
+          ]
+        },
+        {
+          "name": "idx_category",
+          "unique": false,
+          "columns": [
+            "category"
+          ]
+        },
+        {
+          "name": "idx_status",
+          "unique": false,
+          "columns": [
+            "status"
+          ]
+        }
+      ],
+      "foreignKeys": []
+    },
+    "qr_codes": {
+      "comment": "二维码管理表",
+      "engine": "InnoDB",
+      "fieldCount": 8,
+      "primaryKeys": [
+        "_id"
+      ],
+      "indexes": [
+        {
+          "name": "PRIMARY",
+          "unique": true,
+          "columns": [
+            "_id"
+          ]
+        },
+        {
+          "name": "code",
+          "unique": true,
+          "columns": [
+            "code"
+          ]
+        },
+        {
+          "name": "idx_code",
+          "unique": false,
+          "columns": [
+            "code"
+          ]
+        },
+        {
+          "name": "idx_name",
+          "unique": false,
+          "columns": [
+            "name"
+          ]
+        },
+        {
+          "name": "idx_location",
+          "unique": false,
+          "columns": [
+            "location"
+          ]
+        },
+        {
+          "name": "idx_status",
+          "unique": false,
+          "columns": [
+            "status"
+          ]
+        },
+        {
+          "name": "idx_create_time",
+          "unique": false,
+          "columns": [
+            "createTime"
+          ]
+        }
+      ],
+      "foreignKeys": []
+    },
+    "reservations": {
+      "comment": "场地预约表",
+      "engine": "InnoDB",
+      "fieldCount": 21,
+      "primaryKeys": [
+        "_id"
+      ],
+      "indexes": [
+        {
+          "name": "PRIMARY",
+          "unique": true,
+          "columns": [
+            "_id"
+          ]
+        },
+        {
+          "name": "uk_venue_time",
+          "unique": true,
+          "columns": [
+            "venueId",
+            "reservationDate",
+            "startTime",
+            "endTime"
+          ]
+        },
+        {
+          "name": "idx_venue",
+          "unique": false,
+          "columns": [
+            "venueId"
+          ]
+        },
+        {
+          "name": "idx_user",
+          "unique": false,
+          "columns": [
+            "userId"
+          ]
+        },
+        {
+          "name": "idx_date",
+          "unique": false,
+          "columns": [
+            "reservationDate"
+          ]
+        },
+        {
+          "name": "idx_time_range",
+          "unique": false,
+          "columns": [
+            "reservationDate",
+            "startTime",
+            "endTime"
+          ]
+        },
+        {
+          "name": "idx_status",
+          "unique": false,
+          "columns": [
+            "status"
+          ]
+        },
+        {
+          "name": "idx_approver",
+          "unique": false,
+          "columns": [
+            "approvedBy"
+          ]
+        },
+        {
+          "name": "idx_create_time",
+          "unique": false,
+          "columns": [
+            "createTime"
+          ]
+        }
+      ],
+      "foreignKeys": [
+        {
+          "column": "venueId",
+          "references": "venues._id"
+        },
+        {
+          "column": "userId",
+          "references": "users._id"
+        },
+        {
+          "column": "approvedBy",
+          "references": "users._id"
+        }
+      ]
+    },
+    "roles": {
+      "comment": "角色表",
+      "engine": "InnoDB",
+      "fieldCount": 7,
+      "primaryKeys": [
+        "id"
+      ],
+      "indexes": [
+        {
+          "name": "PRIMARY",
+          "unique": true,
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "uk_name",
+          "unique": true,
+          "columns": [
+            "name"
+          ]
+        },
+        {
+          "name": "idx_status",
+          "unique": false,
+          "columns": [
+            "status"
+          ]
+        }
+      ],
+      "foreignKeys": []
+    },
+    "special_reservations": {
+      "comment": "特殊预约表",
+      "engine": "InnoDB",
+      "fieldCount": 19,
+      "primaryKeys": [
+        "_id"
+      ],
+      "indexes": [
+        {
+          "name": "PRIMARY",
+          "unique": true,
+          "columns": [
+            "_id"
+          ]
+        },
+        {
+          "name": "idx_applicant",
+          "unique": false,
+          "columns": [
+            "applicantId"
+          ]
+        },
+        {
+          "name": "idx_name",
+          "unique": false,
+          "columns": [
+            "name"
+          ]
+        },
+        {
+          "name": "idx_phone",
+          "unique": false,
+          "columns": [
+            "phone"
+          ]
+        },
+        {
+          "name": "idx_date",
+          "unique": false,
+          "columns": [
+            "date"
+          ]
+        },
+        {
+          "name": "idx_status",
+          "unique": false,
+          "columns": [
+            "status"
+          ]
+        },
+        {
+          "name": "idx_department",
+          "unique": false,
+          "columns": [
+            "department",
+            "departmentId"
+          ]
+        },
+        {
+          "name": "idx_auditor",
+          "unique": false,
+          "columns": [
+            "auditorId"
+          ]
+        },
+        {
+          "name": "idx_audit_time",
+          "unique": false,
+          "columns": [
+            "auditTime"
+          ]
+        },
+        {
+          "name": "idx_submit_time",
+          "unique": false,
+          "columns": [
+            "submitTime"
+          ]
+        },
+        {
+          "name": "departmentId",
+          "unique": false,
+          "columns": [
+            "departmentId"
+          ]
+        }
+      ],
+      "foreignKeys": [
+        {
+          "column": "applicantId",
+          "references": "users._id"
+        },
+        {
+          "column": "departmentId",
+          "references": "departments._id"
+        },
+        {
+          "column": "auditorId",
+          "references": "users._id"
+        }
+      ]
+    },
+    "system_announcements": {
+      "comment": "系统公告表",
+      "engine": "InnoDB",
+      "fieldCount": 14,
+      "primaryKeys": [
+        "_id"
+      ],
+      "indexes": [
+        {
+          "name": "PRIMARY",
+          "unique": true,
+          "columns": [
+            "_id"
+          ]
+        },
+        {
+          "name": "idx_type",
+          "unique": false,
+          "columns": [
+            "type"
+          ]
+        },
+        {
+          "name": "idx_priority",
+          "unique": false,
+          "columns": [
+            "priority"
+          ]
+        },
+        {
+          "name": "idx_publisher",
+          "unique": false,
+          "columns": [
+            "publisherId"
+          ]
+        },
+        {
+          "name": "idx_status",
+          "unique": false,
+          "columns": [
+            "status"
+          ]
+        },
+        {
+          "name": "idx_publish_time",
+          "unique": false,
+          "columns": [
+            "publishTime"
+          ]
+        },
+        {
+          "name": "idx_expire_time",
+          "unique": false,
+          "columns": [
+            "expireTime"
+          ]
+        },
+        {
+          "name": "idx_create_time",
+          "unique": false,
+          "columns": [
+            "createTime"
+          ]
+        }
+      ],
+      "foreignKeys": [
+        {
+          "column": "publisherId",
+          "references": "users._id"
+        }
+      ]
+    },
+    "system_configs": {
+      "comment": "系统配置表",
+      "engine": "InnoDB",
+      "fieldCount": 10,
+      "primaryKeys": [
+        "_id"
+      ],
+      "indexes": [
+        {
+          "name": "PRIMARY",
+          "unique": true,
+          "columns": [
+            "_id"
+          ]
+        },
+        {
+          "name": "configKey",
+          "unique": true,
+          "columns": [
+            "configKey"
+          ]
+        },
+        {
+          "name": "idx_config_key",
+          "unique": false,
+          "columns": [
+            "configKey"
+          ]
+        },
+        {
+          "name": "idx_category",
+          "unique": false,
+          "columns": [
+            "category"
+          ]
+        },
+        {
+          "name": "idx_is_public",
+          "unique": false,
+          "columns": [
+            "isPublic"
+          ]
+        },
+        {
+          "name": "idx_is_editable",
+          "unique": false,
+          "columns": [
+            "isEditable"
+          ]
+        }
+      ],
+      "foreignKeys": []
+    },
+    "system_notices": {
+      "comment": "系统公告表",
+      "engine": "InnoDB",
+      "fieldCount": 16,
+      "primaryKeys": [
+        "_id"
+      ],
+      "indexes": [
+        {
+          "name": "PRIMARY",
+          "unique": true,
+          "columns": [
+            "_id"
+          ]
+        },
+        {
+          "name": "idx_status",
+          "unique": false,
+          "columns": [
+            "status"
+          ]
+        },
+        {
+          "name": "idx_type",
+          "unique": false,
+          "columns": [
+            "type"
+          ]
+        },
+        {
+          "name": "idx_priority",
+          "unique": false,
+          "columns": [
+            "priority"
+          ]
+        },
+        {
+          "name": "idx_publishTime",
+          "unique": false,
+          "columns": [
+            "publishTime"
+          ]
+        },
+        {
+          "name": "idx_startTime",
+          "unique": false,
+          "columns": [
+            "startTime"
+          ]
+        },
+        {
+          "name": "idx_endTime",
+          "unique": false,
+          "columns": [
+            "endTime"
+          ]
+        }
+      ],
+      "foreignKeys": []
+    },
+    "user_tokens": {
+      "comment": "用户令牌表",
+      "engine": "InnoDB",
+      "fieldCount": 10,
+      "primaryKeys": [
+        "_id"
+      ],
+      "indexes": [
+        {
+          "name": "PRIMARY",
+          "unique": true,
+          "columns": [
+            "_id"
+          ]
+        },
+        {
+          "name": "idx_user_id",
+          "unique": false,
+          "columns": [
+            "userId"
+          ]
+        },
+        {
+          "name": "idx_openid",
+          "unique": false,
+          "columns": [
+            "openid"
+          ]
+        },
+        {
+          "name": "idx_phone",
+          "unique": false,
+          "columns": [
+            "phoneNumber"
+          ]
+        },
+        {
+          "name": "idx_expire_time",
+          "unique": false,
+          "columns": [
+            "expireTime"
+          ]
+        },
+        {
+          "name": "idx_last_used",
+          "unique": false,
+          "columns": [
+            "lastUsedTime"
+          ]
+        }
+      ],
+      "foreignKeys": [
+        {
+          "column": "userId",
+          "references": "users._id"
+        }
+      ]
+    },
+    "users": {
+      "comment": "用户表",
+      "engine": "InnoDB",
+      "fieldCount": 23,
+      "primaryKeys": [
+        "_id"
+      ],
+      "indexes": [
+        {
+          "name": "PRIMARY",
+          "unique": true,
+          "columns": [
+            "_id"
+          ]
+        },
+        {
+          "name": "openid",
+          "unique": true,
+          "columns": [
+            "openid"
+          ]
+        },
+        {
+          "name": "phoneNumber",
+          "unique": true,
+          "columns": [
+            "phoneNumber"
+          ]
+        },
+        {
+          "name": "idx_openid",
+          "unique": false,
+          "columns": [
+            "openid"
+          ]
+        },
+        {
+          "name": "idx_unionid",
+          "unique": false,
+          "columns": [
+            "unionid"
+          ]
+        },
+        {
+          "name": "idx_phone",
+          "unique": false,
+          "columns": [
+            "phoneNumber"
+          ]
+        },
+        {
+          "name": "idx_department",
+          "unique": false,
+          "columns": [
+            "department",
+            "departmentId"
+          ]
+        },
+        {
+          "name": "idx_role",
+          "unique": false,
+          "columns": [
+            "role"
+          ]
+        },
+        {
+          "name": "idx_status",
+          "unique": false,
+          "columns": [
+            "status"
+          ]
+        },
+        {
+          "name": "idx_test_users",
+          "unique": false,
+          "columns": [
+            "isTestUser",
+            "isAdminTest",
+            "isSysAdminTest"
+          ]
+        },
+        {
+          "name": "idx_create_time",
+          "unique": false,
+          "columns": [
+            "createTime"
+          ]
+        },
+        {
+          "name": "idx_last_login",
+          "unique": false,
+          "columns": [
+            "lastLoginTime"
+          ]
+        },
+        {
+          "name": "departmentId",
+          "unique": false,
+          "columns": [
+            "departmentId"
+          ]
+        }
+      ],
+      "foreignKeys": [
+        {
+          "column": "departmentId",
+          "references": "departments._id"
+        }
+      ]
+    },
+    "venues": {
+      "comment": "场地表",
+      "engine": "InnoDB",
+      "fieldCount": 15,
+      "primaryKeys": [
+        "_id"
+      ],
+      "indexes": [
+        {
+          "name": "PRIMARY",
+          "unique": true,
+          "columns": [
+            "_id"
+          ]
+        },
+        {
+          "name": "code",
+          "unique": true,
+          "columns": [
+            "code"
+          ]
+        },
+        {
+          "name": "idx_name",
+          "unique": false,
+          "columns": [
+            "name"
+          ]
+        },
+        {
+          "name": "idx_code",
+          "unique": false,
+          "columns": [
+            "code"
+          ]
+        },
+        {
+          "name": "idx_type",
+          "unique": false,
+          "columns": [
+            "type"
+          ]
+        },
+        {
+          "name": "idx_status",
+          "unique": false,
+          "columns": [
+            "status"
+          ]
+        },
+        {
+          "name": "idx_capacity",
+          "unique": false,
+          "columns": [
+            "capacity"
+          ]
+        },
+        {
+          "name": "idx_manager",
+          "unique": false,
+          "columns": [
+            "managerId"
+          ]
+        }
+      ],
+      "foreignKeys": [
+        {
+          "column": "managerId",
+          "references": "users._id"
+        }
+      ]
+    },
+    "verification_codes": {
+      "comment": "验证码表",
+      "engine": "InnoDB",
+      "fieldCount": 9,
+      "primaryKeys": [
+        "_id"
+      ],
+      "indexes": [
+        {
+          "name": "PRIMARY",
+          "unique": true,
+          "columns": [
+            "_id"
+          ]
+        },
+        {
+          "name": "idx_phone_code",
+          "unique": false,
+          "columns": [
+            "phoneNumber",
+            "code"
+          ]
+        },
+        {
+          "name": "idx_phone_type",
+          "unique": false,
+          "columns": [
+            "phoneNumber",
+            "type"
+          ]
+        },
+        {
+          "name": "idx_expire_time",
+          "unique": false,
+          "columns": [
+            "expireTime"
+          ]
+        },
+        {
+          "name": "idx_status",
+          "unique": false,
+          "columns": [
+            "status"
+          ]
+        },
+        {
+          "name": "idx_create_time",
+          "unique": false,
+          "columns": [
+            "createTime"
+          ]
+        }
+      ],
+      "foreignKeys": []
+    },
+    "verification_schemes": {
+      "comment": "验证方案表",
+      "engine": "InnoDB",
+      "fieldCount": 10,
+      "primaryKeys": [
+        "_id"
+      ],
+      "indexes": [
+        {
+          "name": "PRIMARY",
+          "unique": true,
+          "columns": [
+            "_id"
+          ]
+        },
+        {
+          "name": "idx_type",
+          "unique": false,
+          "columns": [
+            "type"
+          ]
+        },
+        {
+          "name": "idx_status",
+          "unique": false,
+          "columns": [
+            "status"
+          ]
+        },
+        {
+          "name": "idx_sort",
+          "unique": false,
+          "columns": [
+            "sort"
+          ]
+        }
+      ],
+      "foreignKeys": []
+    }
+  },
+  "relationships": [
+    {
+      "from": "activity_logs.userId",
+      "to": "users._id",
+      "updateRule": "NO ACTION",
+      "deleteRule": "SET NULL"
+    },
+    {
+      "from": "departments.parentId",
+      "to": "departments._id",
+      "updateRule": "NO ACTION",
+      "deleteRule": "SET NULL"
+    },
+    {
+      "from": "dining_confirmation_logs.orderId",
+      "to": "dining_orders._id",
+      "updateRule": "NO ACTION",
+      "deleteRule": "CASCADE"
+    },
+    {
+      "from": "dining_confirmation_logs.userId",
+      "to": "users._id",
+      "updateRule": "NO ACTION",
+      "deleteRule": "CASCADE"
+    },
+    {
+      "from": "dining_confirmation_logs.confirmedBy",
+      "to": "users._id",
+      "updateRule": "NO ACTION",
+      "deleteRule": "SET NULL"
+    },
+    {
+      "from": "dining_orders.menuId",
+      "to": "menus._id",
+      "updateRule": "NO ACTION",
+      "deleteRule": "SET NULL"
+    },
+    {
+      "from": "dining_orders.registrantId",
+      "to": "users._id",
+      "updateRule": "NO ACTION",
+      "deleteRule": "CASCADE"
+    },
+    {
+      "from": "dining_orders.deptId",
+      "to": "departments._id",
+      "updateRule": "NO ACTION",
+      "deleteRule": "SET NULL"
+    },
+    {
+      "from": "dining_orders.confirmedBy",
+      "to": "users._id",
+      "updateRule": "NO ACTION",
+      "deleteRule": "SET NULL"
+    },
+    {
+      "from": "dining_registrations.userId",
+      "to": "users._id",
+      "updateRule": "NO ACTION",
+      "deleteRule": "CASCADE"
+    },
+    {
+      "from": "dining_registrations.qrCodeId",
+      "to": "qr_codes._id",
+      "updateRule": "NO ACTION",
+      "deleteRule": "CASCADE"
+    },
+    {
+      "from": "dining_registrations.orderId",
+      "to": "dining_orders._id",
+      "updateRule": "NO ACTION",
+      "deleteRule": "SET NULL"
+    },
+    {
+      "from": "dining_verifications.userId",
+      "to": "users._id",
+      "updateRule": "NO ACTION",
+      "deleteRule": "CASCADE"
+    },
+    {
+      "from": "dining_verifications.tableId",
+      "to": "dining_tables._id",
+      "updateRule": "NO ACTION",
+      "deleteRule": "CASCADE"
+    },
+    {
+      "from": "dining_verifications.orderId",
+      "to": "dining_orders._id",
+      "updateRule": "NO ACTION",
+      "deleteRule": "SET NULL"
+    },
+    {
+      "from": "dining_verifications.verifierId",
+      "to": "users._id",
+      "updateRule": "NO ACTION",
+      "deleteRule": "SET NULL"
+    },
+    {
+      "from": "dishes.categoryId",
+      "to": "dish_categories._id",
+      "updateRule": "NO ACTION",
+      "deleteRule": "SET NULL"
+    },
+    {
+      "from": "file_uploads.uploaderId",
+      "to": "users._id",
+      "updateRule": "NO ACTION",
+      "deleteRule": "CASCADE"
+    },
+    {
+      "from": "menu_dishes.menuId",
+      "to": "menus._id",
+      "updateRule": "NO ACTION",
+      "deleteRule": "CASCADE"
+    },
+    {
+      "from": "menu_dishes.dishId",
+      "to": "dishes._id",
+      "updateRule": "NO ACTION",
+      "deleteRule": "CASCADE"
+    },
+    {
+      "from": "menus.publisherId",
+      "to": "users._id",
+      "updateRule": "NO ACTION",
+      "deleteRule": "SET NULL"
+    },
+    {
+      "from": "reservations.venueId",
+      "to": "venues._id",
+      "updateRule": "NO ACTION",
+      "deleteRule": "CASCADE"
+    },
+    {
+      "from": "reservations.userId",
+      "to": "users._id",
+      "updateRule": "NO ACTION",
+      "deleteRule": "CASCADE"
+    },
+    {
+      "from": "reservations.approvedBy",
+      "to": "users._id",
+      "updateRule": "NO ACTION",
+      "deleteRule": "SET NULL"
+    },
+    {
+      "from": "special_reservations.applicantId",
+      "to": "users._id",
+      "updateRule": "NO ACTION",
+      "deleteRule": "SET NULL"
+    },
+    {
+      "from": "special_reservations.departmentId",
+      "to": "departments._id",
+      "updateRule": "NO ACTION",
+      "deleteRule": "SET NULL"
+    },
+    {
+      "from": "special_reservations.auditorId",
+      "to": "users._id",
+      "updateRule": "NO ACTION",
+      "deleteRule": "SET NULL"
+    },
+    {
+      "from": "system_announcements.publisherId",
+      "to": "users._id",
+      "updateRule": "NO ACTION",
+      "deleteRule": "CASCADE"
+    },
+    {
+      "from": "user_tokens.userId",
+      "to": "users._id",
+      "updateRule": "NO ACTION",
+      "deleteRule": "CASCADE"
+    },
+    {
+      "from": "users.departmentId",
+      "to": "departments._id",
+      "updateRule": "NO ACTION",
+      "deleteRule": "SET NULL"
+    },
+    {
+      "from": "venues.managerId",
+      "to": "users._id",
+      "updateRule": "NO ACTION",
+      "deleteRule": "SET NULL"
+    }
+  ]
+}

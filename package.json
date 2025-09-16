@@ -18,6 +18,8 @@
     "update-db": "node scripts/updateDatabase.js update",
     "test-interfaces": "node scripts/test-new-interfaces.js",
     "test-system": "node scripts/test-complete-system.js",
+    "export-schema": "node scripts/exportDatabaseSchema.js export",
+    "export-summary": "node scripts/exportDatabaseSchema.js summary",
     "test-admin": "node scripts/testAdminAPI.js",
     "init-db-admin": "node scripts/initDatabaseComplete.js init"
   },

@@ -100,6 +100,15 @@ node examples/time-handling-examples.js
 
 # 运行前端时间处理示例
 node examples/frontend-time-examples.js
+
+# 导出数据库结构为JSON格式
+npm run export-schema
+
+# 导出数据库摘要
+npm run export-summary
+
+# 运行数据库结构使用示例
+node examples/database-schema-usage.js
 ```
 
 ## 📊 修复效果

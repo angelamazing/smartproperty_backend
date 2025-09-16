@@ -1,4 +1,4 @@
-const { getCorsConfig, getAllowedOrigins } = require('./config/cors');
+const { getCorsConfig, getAllowedOrigins } = require('../config/cors');
 
 async function testCorsConfig() {
   console.log('🧪 测试CORS配置...\n');
