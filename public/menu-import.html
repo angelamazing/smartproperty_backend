@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>菜单批量导入</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        .header h1 {
+            color: #333;
+            margin: 0;
+        }
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            background-color: #fafafa;
+        }
+        .section h3 {
+            margin-top: 0;
+            color: #555;
+        }
+        .btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        .btn:hover {
+            background: #0056b3;
+        }
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .btn-success {
+            background: #28a745;
+        }
+        .btn-success:hover {
+            background: #1e7e34;
+        }
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+        .btn-danger {
+            background: #dc3545;
+        }
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        .file-input {
+            margin: 10px 0;
+        }
+        .file-input input[type="file"] {
+            margin-right: 10px;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .preview-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        .preview-table th,
+        .preview-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        .preview-table th {
+            background-color: #f2f2f2;
+        }
+        .history-item {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            background: white;
+        }
+        .history-item .time {
+            color: #666;
+            font-size: 0.9em;
+        }
+        .history-item .status {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            margin-left: 10px;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status.failed {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🍽️ 菜单批量导入系统</h1>
+            <p>支持Excel文件批量导入一周的早中晚餐菜单</p>
+        </div>
+
+        <!-- 登录区域 -->
+        <div class="section" id="loginSection">
+            <h3>🔐 管理员登录</h3>
+            <div>
+                <input type="text" id="phoneInput" placeholder="手机号" value="13800138001" style="margin-right: 10px; padding: 8px;">
+                <input type="password" id="passwordInput" placeholder="密码" value="admin123456" style="margin-right: 10px; padding: 8px;">
+                <button class="btn" onclick="login()">登录</button>
+            </div>
+            <div id="loginStatus"></div>
+        </div>
+
+        <!-- 模板下载区域 -->
+        <div class="section" id="templateSection" style="display: none;">
+            <h3>📥 下载Excel模板</h3>
+            <p>下载标准的Excel导入模板，按照模板格式填写菜单数据</p>
+            <button class="btn btn-success" onclick="downloadTemplate()">下载模板</button>
+            <div id="templateStatus"></div>
+        </div>
+
+        <!-- 文件上传区域 -->
+        <div class="section" id="uploadSection" style="display: none;">
+            <h3>📤 上传Excel文件</h3>
+            <div class="file-input">
+                <input type="file" id="excelFile" accept=".xlsx,.xls" onchange="handleFileSelect()">
+                <button class="btn" onclick="parseExcel()" id="parseBtn" disabled>解析文件</button>
+            </div>
+            <div id="uploadStatus"></div>
+        </div>
+
+        <!-- 数据预览区域 -->
+        <div class="section" id="previewSection" style="display: none;">
+            <h3>👀 数据预览</h3>
+            <div id="previewContent"></div>
+            <div style="margin-top: 20px;">
+                <button class="btn btn-warning" onclick="executeImport()" id="importBtn">执行导入</button>
+                <button class="btn" onclick="resetUpload()">重新上传</button>
+            </div>
+            <div id="importStatus"></div>
+        </div>
+
+        <!-- 导入历史区域 -->
+        <div class="section" id="historySection" style="display: none;">
+            <h3>📚 导入历史</h3>
+            <button class="btn" onclick="loadImportHistory()">刷新历史</button>
+            <div id="historyContent"></div>
+        </div>
+    </div>
+
+    <script src="/js/api-utils.js"></script>
+    <script>
+        let currentParseData = null;
+        let isLoggedIn = false;
+
+        // 登录
+        async function login() {
+            const phone = document.getElementById('phoneInput').value;
+            const password = document.getElementById('passwordInput').value;
+            const statusDiv = document.getElementById('loginStatus');
+
+            if (!phone || !password) {
+                showStatus(statusDiv, '请输入手机号和密码', 'error');
+                return;
+            }
+
+            try {
+                showStatus(statusDiv, '正在登录...', 'info');
+                const response = await window.api.authApi.login({ phoneNumber: phone, password: password });
+                
+                if (response.success) {
+                    localStorage.setItem('token', response.data.token);
+                    isLoggedIn = true;
+                    showStatus(statusDiv, '登录成功！', 'success');
+                    showLoggedInSections();
+                } else {
+                    showStatus(statusDiv, '登录失败：' + response.message, 'error');
+                }
+            } catch (error) {
+                showStatus(statusDiv, '登录失败：' + error.message, 'error');
+            }
+        }
+
+        // 显示登录后的区域
+        function showLoggedInSections() {
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('templateSection').style.display = 'block';
+            document.getElementById('uploadSection').style.display = 'block';
+            document.getElementById('historySection').style.display = 'block';
+        }
+
+        // 下载模板
+        async function downloadTemplate() {
+            const statusDiv = document.getElementById('templateStatus');
+            
+            try {
+                showStatus(statusDiv, '正在下载模板...', 'info');
+                await window.api.menuImportApi.downloadTemplate();
+                showStatus(statusDiv, '模板下载成功！', 'success');
+            } catch (error) {
+                showStatus(statusDiv, '下载失败：' + error.message, 'error');
+            }
+        }
+
+        // 处理文件选择
+        function handleFileSelect() {
+            const fileInput = document.getElementById('excelFile');
+            const parseBtn = document.getElementById('parseBtn');
+            
+            if (fileInput.files.length > 0) {
+                parseBtn.disabled = false;
+            } else {
+                parseBtn.disabled = true;
+            }
+        }
+
+        // 解析Excel文件
+        async function parseExcel() {
+            const fileInput = document.getElementById('excelFile');
+            const statusDiv = document.getElementById('uploadStatus');
+            
+            if (!fileInput.files.length) {
+                showStatus(statusDiv, '请选择Excel文件', 'error');
+                return;
+            }
+
+            try {
+                showStatus(statusDiv, '正在解析文件...', 'info');
+                const response = await window.api.menuImportApi.uploadAndParseExcel(fileInput.files[0]);
+                
+                if (response.success) {
+                    currentParseData = response.data.parseResult.data;
+                    showStatus(statusDiv, '文件解析成功！', 'success');
+                    showPreview();
+                } else {
+                    showStatus(statusDiv, '解析失败：' + response.message, 'error');
+                }
+            } catch (error) {
+                showStatus(statusDiv, '解析失败：' + error.message, 'error');
+            }
+        }
+
+        // 显示预览
+        function showPreview() {
+            const previewSection = document.getElementById('previewSection');
+            const previewContent = document.getElementById('previewContent');
+            
+            if (!currentParseData || currentParseData.length === 0) {
+                previewContent.innerHTML = '<p>没有可预览的数据</p>';
+                return;
+            }
+
+            let html = '<h4>解析结果预览：</h4>';
+            html += '<p>共解析到 ' + currentParseData.length + ' 条菜单数据</p>';
+            
+            // 按日期分组显示
+            const groupedData = {};
+            currentParseData.forEach(item => {
+                const date = item.date;
+                if (!groupedData[date]) {
+                    groupedData[date] = [];
+                }
+                groupedData[date].push(item);
+            });
+
+            Object.keys(groupedData).sort().forEach(date => {
+                html += '<h5>' + date + '</h5>';
+                html += '<table class="preview-table">';
+                html += '<tr><th>餐次</th><th>菜品名称</th><th>价格</th><th>分类</th></tr>';
+                
+                groupedData[date].forEach(item => {
+                    html += '<tr>';
+                    html += '<td>' + item.mealType + '</td>';
+                    html += '<td>' + item.dishName + '</td>';
+                    html += '<td>¥' + item.price + '</td>';
+                    html += '<td>' + item.category + '</td>';
+                    html += '</tr>';
+                });
+                
+                html += '</table>';
+            });
+
+            previewContent.innerHTML = html;
+            previewSection.style.display = 'block';
+        }
+
+        // 执行导入
+        async function executeImport() {
+            const statusDiv = document.getElementById('importStatus');
+            const importBtn = document.getElementById('importBtn');
+            
+            if (!currentParseData) {
+                showStatus(statusDiv, '没有可导入的数据', 'error');
+                return;
+            }
+
+            try {
+                importBtn.disabled = true;
+                importBtn.innerHTML = '<span class="loading"></span> 正在导入...';
+                
+                showStatus(statusDiv, '正在执行批量导入...', 'info');
+                
+                const response = await window.api.menuImportApi.batchImportMenus({
+                    menuData: currentParseData,
+                    options: {
+                        overwrite: true,
+                        allowPastDates: false,
+                        description: 'Web界面导入'
+                    },
+                    filename: document.getElementById('excelFile').files[0]?.name || '导入文件'
+                });
+                
+                if (response.success) {
+                    showStatus(statusDiv, '导入成功！共导入 ' + response.data.summary.successCount + ' 个菜单', 'success');
+                    loadImportHistory(); // 刷新历史记录
+                } else {
+                    showStatus(statusDiv, '导入失败：' + response.message, 'error');
+                }
+            } catch (error) {
+                showStatus(statusDiv, '导入失败：' + error.message, 'error');
+            } finally {
+                importBtn.disabled = false;
+                importBtn.innerHTML = '执行导入';
+            }
+        }
+
+        // 重置上传
+        function resetUpload() {
+            document.getElementById('excelFile').value = '';
+            document.getElementById('parseBtn').disabled = true;
+            document.getElementById('previewSection').style.display = 'none';
+            document.getElementById('uploadStatus').innerHTML = '';
+            document.getElementById('importStatus').innerHTML = '';
+            currentParseData = null;
+        }
+
+        // 加载导入历史
+        async function loadImportHistory() {
+            const historyContent = document.getElementById('historyContent');
+            
+            try {
+                const response = await window.api.menuImportApi.getImportHistory({ page: 1, pageSize: 10 });
+                
+                if (response.success) {
+                    const history = response.data.list;
+                    
+                    if (history.length === 0) {
+                        historyContent.innerHTML = '<p>暂无导入历史</p>';
+                        return;
+                    }
+                    
+                    let html = '<h4>最近导入记录：</h4>';
+                    history.forEach(record => {
+                        const details = JSON.parse(record.details);
+                        const statusClass = details.success ? 'success' : 'failed';
+                        const statusText = details.success ? '成功' : '失败';
+                        
+                        html += '<div class="history-item">';
+                        html += '<div><strong>' + record.resourceId + '</strong>';
+                        html += '<span class="status ' + statusClass + '">' + statusText + '</span></div>';
+                        html += '<div class="time">' + new Date(record.createTime).toLocaleString() + '</div>';
+                        if (details.summary) {
+                            html += '<div>成功: ' + details.summary.successCount + ', 失败: ' + details.summary.failedCount + '</div>';
+                        }
+                        html += '</div>';
+                    });
+                    
+                    historyContent.innerHTML = html;
+                } else {
+                    historyContent.innerHTML = '<p>加载历史失败：' + response.message + '</p>';
+                }
+            } catch (error) {
+                historyContent.innerHTML = '<p>加载历史失败：' + error.message + '</p>';
+            }
+        }
+
+        // 显示状态信息
+        function showStatus(element, message, type) {
+            element.innerHTML = '<div class="status ' + type + '">' + message + '</div>';
+        }
+
+        // 页面加载时检查登录状态
+        window.onload = function() {
+            const token = localStorage.getItem('token');
+            if (token) {
+                isLoggedIn = true;
+                showLoggedInSections();
+                loadImportHistory();
+            }
+        };
+    </script>
+</body>
+</html>
+

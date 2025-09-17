@@ -8,6 +8,7 @@ const { uploadAvatar, handleUploadError, debugUpload, afterUpload } = require('.
 
 // 导入管理员控制器
 const adminController = require('../controllers/adminController');
+const menuImportController = require('../controllers/menuImportController');
 
 // 权限验证中间件 - 所有管理员接口都需要管理员权限
 router.use(authenticateToken);
@@ -149,6 +150,62 @@ router.post('/menu/:menuId/dishes', [
   body('dishItems.*.sort').optional().isInt({ min: 0 }).withMessage('排序必须大于等于0'),
   validate
 ], adminController.setMenuDishes);
+
+// ================================
+// 2.1 菜单批量导入模块
+// ================================
+
+/**
+ * @route GET /api/admin/menu/import/template
+ * @desc 下载菜单导入Excel模板
+ * @access Admin
+ */
+router.get('/menu/import/template', menuImportController.downloadTemplate);
+
+/**
+ * @route POST /api/admin/menu/import/parse
+ * @desc 上传并解析Excel文件
+ * @access Admin
+ */
+router.post('/menu/import/parse', 
+  menuImportController.uploadMiddleware,
+  menuImportController.uploadAndParseExcel
+);
+
+/**
+ * @route POST /api/admin/menu/import/preview
+ * @desc 预览导入数据
+ * @access Admin
+ */
+router.post('/menu/import/preview', [
+  body('menuData').isArray().withMessage('菜单数据必须是数组'),
+  validate
+], menuImportController.previewImportData);
+
+/**
+ * @route POST /api/admin/menu/import/execute
+ * @desc 执行批量导入菜单
+ * @access Admin
+ */
+router.post('/menu/import/execute', [
+  body('menuData').isArray().withMessage('菜单数据必须是数组'),
+  body('options').optional().isObject().withMessage('选项必须是对象'),
+  body('options.overwrite').optional().isBoolean().withMessage('覆盖选项必须是布尔值'),
+  body('options.allowPastDates').optional().isBoolean().withMessage('允许过去日期选项必须是布尔值'),
+  body('options.description').optional().isString().withMessage('描述必须是字符串'),
+  validate
+], menuImportController.batchImportMenus);
+
+/**
+ * @route GET /api/admin/menu/import/history
+ * @desc 获取导入历史记录
+ * @access Admin
+ */
+router.get('/menu/import/history', [
+  query('page').optional().isInt({ min: 1 }).withMessage('页码必须大于0'),
+  query('pageSize').optional().isInt({ min: 1, max: 100 }).withMessage('每页数量必须在1-100之间'),
+  validate
+], menuImportController.getImportHistory);
 
 // ================================
 // 3. 用户管理模块
