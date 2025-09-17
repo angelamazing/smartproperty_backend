@@ -48,6 +48,13 @@ const getSystemStatus = async (req, res) => {
  */
 const saveMenuDraft = async (req, res) => {
   try {
+    const TimeUtils = require('../utils/timeUtils');
+    
+    // 验证发布日期不能是过去的日期
+    if (req.body.date && TimeUtils.isPastDate(req.body.date)) {
+      return ResponseHelper.error(res, '发布日期不能是过去的日期', 400);
+    }
+    
     const menuData = {
       ...req.body,
       adminId: req.user.id,
@@ -67,12 +74,27 @@ const saveMenuDraft = async (req, res) => {
  */
 const publishMenu = async (req, res) => {
   try {
+    const TimeUtils = require('../utils/timeUtils');
+    
+    // 使用统一的时间处理工具类
+    const now = TimeUtils.getBeijingTime();
+    const utcNow = TimeUtils.toUTCForStorage(now);
+    
     const menuData = {
       ...req.body,
       adminId: req.user.id,
       status: 'published',
-      publishTime: new Date()
+      publishTime: utcNow,
+      // 如果前端提供了生效时间，则使用前端时间，否则使用当前时间
+      effectiveTime: req.body.effectiveTime ? 
+        TimeUtils.toUTCForStorage(req.body.effectiveTime) : 
+        utcNow
     };
+    
+    // 验证时间参数
+    if (req.body.effectiveTime && TimeUtils.isPastDate(req.body.effectiveTime)) {
+      return ResponseHelper.error(res, '生效时间不能是过去的日期', 400);
+    }
     
     const menu = await adminService.publishMenu(req.db, menuData);
     ResponseHelper.success(res, menu, '菜单发布成功');
@@ -168,6 +190,21 @@ const revokeMenu = async (req, res) => {
   } catch (error) {
     logger.error('撤回菜单失败:', error);
     ResponseHelper.error(res, error.message || '撤回菜单失败', 500);
+  }
+};
+
+/**
+ * 删除菜单
+ */
+const deleteMenu = async (req, res) => {
+  try {
+    const { menuId } = req.params;
+    
+    const result = await adminService.deleteMenu(req.db, menuId, req.user.id);
+    ResponseHelper.success(res, result, '删除菜单成功');
+  } catch (error) {
+    logger.error('删除菜单失败:', error);
+    ResponseHelper.error(res, error.message || '删除菜单失败', 500);
   }
 };
 
@@ -1412,6 +1449,7 @@ module.exports = {
   getMenuHistory,
   getMenuTemplates,
   revokeMenu,
+  deleteMenu,
   deleteMenuTemplate,
   getMenuDishes,
   setMenuDishes,

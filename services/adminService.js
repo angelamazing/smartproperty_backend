@@ -112,19 +112,26 @@ const getSystemStatus = async (db) => {
  */
 const saveMenuDraft = async (db, menuData) => {
   const connection = await db.getConnection();
+  const TimeUtils = require('../utils/timeUtils');
   
   try {
     await connection.beginTransaction();
     
     const { date, mealType, dishes, description, adminId } = menuData;
     
+    // 修复publishDate字段的时区问题
+    // 直接存储日期字符串，不进行时区转换
+    // 因为用户选择的日期就是目标日期，不需要时区处理
+    
     // 检查是否已存在相同日期和餐次的菜单
+    // 直接比较字符串，不使用时区转换
     const [existing] = await connection.execute(
       'SELECT _id, publishStatus FROM menus WHERE publishDate = ? AND mealType = ?',
       [date, mealType]
     );
     
     let menuId;
+    const now = TimeUtils.toUTCForStorage(TimeUtils.getBeijingTime());
     
     if (existing.length > 0) {
       // 如果存在，更新现有菜单
@@ -135,10 +142,10 @@ const saveMenuDraft = async (db, menuData) => {
         throw new Error('当日该餐次菜单已发布，请先撤回后再编辑');
       }
       
-      // 更新菜单基本信息
+      // 更新菜单基本信息，使用统一时间处理
       await connection.execute(
-        'UPDATE menus SET description = ?, publisherId = ?, updateTime = NOW() WHERE _id = ?',
-        [description, adminId, menuId]
+        'UPDATE menus SET description = ?, publisherId = ?, updateTime = ? WHERE _id = ?',
+        [description, adminId, now, menuId]
       );
       
       // 删除现有菜品关联
@@ -149,9 +156,10 @@ const saveMenuDraft = async (db, menuData) => {
       // 如果不存在，创建新菜单
       menuId = uuidv4();
       
+      // 直接存储日期字符串，不进行时区转换
       await connection.execute(
-        'INSERT INTO menus (_id, publishDate, mealType, description, publishStatus, publisherId, createTime) VALUES (?, ?, ?, ?, ?, ?, NOW())',
-        [menuId, date, mealType, description, 'draft', adminId]
+        'INSERT INTO menus (_id, publishDate, mealType, description, publishStatus, publisherId, createTime, updateTime) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+        [menuId, date, mealType, description, 'draft', adminId, now, now]
       );
       
       console.log(`创建新菜单草稿: ${menuId}`);
@@ -161,15 +169,33 @@ const saveMenuDraft = async (db, menuData) => {
     if (dishes && dishes.length > 0) {
       for (const dish of dishes) {
         await connection.execute(
-          'INSERT INTO menu_dishes (_id, menuId, dishId, price, sort, createTime) VALUES (?, ?, ?, ?, ?, NOW())',
-          [uuidv4(), menuId, dish.dishId, dish.price || 0, dish.sort || 0]
+          'INSERT INTO menu_dishes (_id, menuId, dishId, price, sort, createTime) VALUES (?, ?, ?, ?, ?, ?)',
+          [uuidv4(), menuId, dish.dishId, dish.price || 0, dish.sort || 0, now]
         );
       }
     }
     
     await connection.commit();
     
-    return { id: menuId, ...menuData };
+    // 查询并返回实际存储的数据，直接使用存储的日期字符串
+    const [result] = await connection.execute(`
+      SELECT 
+        _id as id,
+        publishDate as date,
+        mealType,
+        description,
+        publishStatus as status,
+        createTime,
+        updateTime
+      FROM menus 
+      WHERE _id = ?
+    `, [menuId]);
+    
+    if (result.length > 0) {
+      return result[0];
+    } else {
+      throw new Error('菜单创建后查询失败');
+    }
   } catch (error) {
     await connection.rollback();
     throw new Error(`保存菜单草稿失败: ${error.message}`);
@@ -183,13 +209,19 @@ const saveMenuDraft = async (db, menuData) => {
  */
 const publishMenu = async (db, menuData) => {
   const connection = await db.getConnection();
+  const TimeUtils = require('../utils/timeUtils');
   
   try {
     await connection.beginTransaction();
     
-    const { date, mealType } = menuData;
+    const { date, mealType, publishTime, effectiveTime } = menuData;
+    
+    // 修复publishDate字段的时区问题
+    // 直接存储日期字符串，不进行时区转换
+    // 因为用户选择的日期就是目标日期，不需要时区处理
     
     // 检查是否已有当日菜单
+    // 直接比较字符串，不使用时区转换
     const [existing] = await connection.execute(
       'SELECT _id, publishStatus FROM menus WHERE publishDate = ? AND mealType = ?',
       [date, mealType]
@@ -205,22 +237,44 @@ const publishMenu = async (db, menuData) => {
       // 如果存在草稿，直接发布现有菜单
       const menuId = existing[0]._id;
       
+      // 使用统一的时间处理，设置发布时间和生效时间
       await connection.execute(
-        'UPDATE menus SET publishStatus = "published", updateTime = NOW() WHERE _id = ?',
-        [menuId]
+        'UPDATE menus SET publishStatus = "published", publishTime = ?, effectiveTime = ?, updateTime = ? WHERE _id = ?',
+        [publishTime, effectiveTime, publishTime, menuId]
       );
       
       await connection.commit();
-      return { id: menuId, ...menuData };
+      
+      // 查询并返回实际存储的数据，直接使用存储的日期字符串
+      const [result] = await connection.execute(`
+        SELECT 
+          _id as id,
+          publishDate as date,
+          mealType,
+          description,
+          publishStatus as status,
+          publishTime,
+          effectiveTime,
+          createTime,
+          updateTime
+        FROM menus 
+        WHERE _id = ?
+      `, [menuId]);
+      
+      if (result.length > 0) {
+        return result[0];
+      } else {
+        throw new Error('菜单发布后查询失败');
+      }
     }
     
     // 如果不存在，创建新菜单并发布
     const result = await saveMenuDraft(db, { ...menuData, status: 'published' });
     
-    // 更新状态为已发布
+    // 更新状态为已发布，并设置发布时间和生效时间
     await connection.execute(
-      'UPDATE menus SET publishStatus = "published" WHERE _id = ?',
-      [result.id]
+      'UPDATE menus SET publishStatus = "published", publishTime = ?, effectiveTime = ?, updateTime = ? WHERE _id = ?',
+      [publishTime, effectiveTime, publishTime, result.id]
     );
     
     await connection.commit();
@@ -545,6 +599,48 @@ const revokeMenu = async (db, menuId, adminId) => {
     }
   } catch (error) {
     throw new Error(`撤回菜单失败: ${error.message}`);
+  }
+};
+
+/**
+ * 删除菜单
+ */
+const deleteMenu = async (db, menuId, adminId) => {
+  try {
+    // 检查菜单是否存在
+    const [menus] = await db.execute(
+      'SELECT _id, publishStatus FROM menus WHERE _id = ?',
+      [menuId]
+    );
+    
+    if (menus.length === 0) {
+      throw new Error('菜单不存在');
+    }
+    
+    const menu = menus[0];
+    
+    // 检查菜单状态，只有草稿状态的菜单可以删除
+    if (menu.publishStatus === 'published') {
+      throw new Error('已发布的菜单不能删除，请先撤回');
+    }
+    
+    if (menu.publishStatus === 'revoked') {
+      throw new Error('已撤回的菜单不能删除');
+    }
+    
+    // 删除菜单
+    const [result] = await db.execute(
+      'DELETE FROM menus WHERE _id = ? AND publishStatus = "draft"',
+      [menuId]
+    );
+    
+    if (result.affectedRows === 0) {
+      throw new Error('菜单删除失败，可能已被删除或状态不允许删除');
+    }
+    
+    return { menuId, status: 'deleted' };
+  } catch (error) {
+    throw new Error(`删除菜单失败: ${error.message}`);
   }
 };
 
@@ -2860,6 +2956,7 @@ module.exports = {
   getMenuHistory,
   getMenuTemplates,
   revokeMenu,
+  deleteMenu,
   deleteMenuTemplate,
   getMenuDishes,
   setMenuDishes,

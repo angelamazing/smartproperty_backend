@@ -243,8 +243,15 @@ const reservationSchemas = {
 const venueSchemas = {
   // 获取场地列表
   getVenues: Joi.object({
-    date: commonSchemas.date,
-    type: Joi.string().valid('badminton', 'pingpong', 'basketball', 'other').allow('')
+    date: commonSchemas.date.optional(),
+    type: Joi.string().valid('badminton', 'pingpong', 'basketball', 'meeting', 'other').allow(''),
+    page: commonSchemas.page,
+    pageSize: commonSchemas.pageSize
+  }),
+  
+  // 获取场地时间安排
+  getVenueSchedule: Joi.object({
+    date: commonSchemas.date.required()
   }),
   
   // 提交场地预约
@@ -253,19 +260,43 @@ const venueSchemas = {
     date: commonSchemas.date,
     startTime: commonSchemas.time.required(),
     endTime: commonSchemas.time.required(),
-    userName: Joi.string().min(2).max(50).required().messages({
-      'string.min': '预约人姓名至少2个字符',
-      'string.max': '预约人姓名最多50个字符',
-      'any.required': '预约人姓名是必填项'
-    }),
-    phoneNumber: commonSchemas.phoneNumber,
     purpose: Joi.string().max(200).required().messages({
       'string.max': '预约用途最多200个字符',
       'any.required': '预约用途是必填项'
     }),
     remark: Joi.string().max(500).allow('').messages({
       'string.max': '备注最多500个字符'
+    }),
+    participants: Joi.array().items(
+      Joi.object({
+        name: Joi.string().min(2).max(50).required().messages({
+          'string.min': '参与人姓名至少2个字符',
+          'string.max': '参与人姓名最多50个字符',
+          'any.required': '参与人姓名是必填项'
+        }),
+        phone: Joi.string().pattern(/^1[3-9]\d{9}$/).optional().messages({
+          'string.pattern.base': '参与人手机号格式不正确'
+        })
+      })
+    ).max(20).messages({
+      'array.max': '参与人员最多20人'
     })
+  }),
+  
+  // 获取用户预约记录
+  getUserReservations: Joi.object({
+    page: commonSchemas.page,
+    pageSize: commonSchemas.pageSize,
+    status: Joi.string().valid('pending', 'confirmed', 'rejected', 'cancelled', 'completed').allow(''),
+    date: commonSchemas.date.optional()
+  }),
+  
+  // 检查时间段可用性
+  checkTimeAvailability: Joi.object({
+    venueId: commonSchemas.id,
+    date: commonSchemas.date,
+    startTime: commonSchemas.time.required(),
+    endTime: commonSchemas.time.required()
   })
 };
 

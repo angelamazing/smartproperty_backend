@@ -107,6 +107,16 @@ router.put('/menu/:menuId/revoke', [
 ], adminController.revokeMenu);
 
 /**
+ * @route DELETE /api/admin/menu/:menuId
+ * @desc 删除菜单
+ * @access Admin
+ */
+router.delete('/menu/:menuId', [
+  param('menuId').notEmpty().withMessage('菜单ID不能为空'),
+  validate
+], adminController.deleteMenu);
+
+/**
  * @route DELETE /api/admin/menu/templates/:templateId
  * @desc 删除菜单模板
  * @access Admin

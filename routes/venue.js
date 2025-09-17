@@ -2,64 +2,118 @@ const express = require('express');
 const router = express.Router();
 const { authenticateToken } = require('../middleware/auth');
 const { validate, schemas } = require('../utils/validation');
-const response = require('../utils/response');
+const venueController = require('../controllers/venueController');
 
 /**
  * 球馆预约路由
+ * 提供用户端的场地预约相关功能
  */
 
-// 获取场地列表
+// ================================
+// 场地管理相关接口
+// ================================
+
+/**
+ * @route GET /api/venue/list
+ * @desc 获取可用场地列表
+ * @access Private
+ */
 router.get('/list',
   authenticateToken,
   validate(schemas.venue.getVenues, 'query'),
-  async (req, res) => {
-    try {
-      // 实现获取场地列表逻辑
-      return response.success(res, [], '获取场地列表成功');
-    } catch (error) {
-      return response.serverError(res, '获取场地列表失败', error.message);
-    }
-  }
+  venueController.getAvailableVenues
 );
 
-// 提交场地预约
+/**
+ * @route GET /api/venue/types
+ * @desc 获取场地类型列表
+ * @access Private
+ */
+router.get('/types',
+  authenticateToken,
+  venueController.getVenueTypes
+);
+
+/**
+ * @route GET /api/venue/:venueId
+ * @desc 获取场地详细信息
+ * @access Private
+ */
+router.get('/:venueId',
+  authenticateToken,
+  venueController.getVenueDetail
+);
+
+/**
+ * @route GET /api/venue/:venueId/schedule
+ * @desc 获取场地时间安排
+ * @access Private
+ */
+router.get('/:venueId/schedule',
+  authenticateToken,
+  validate(schemas.venue.getVenueSchedule, 'query'),
+  venueController.getVenueSchedule
+);
+
+// ================================
+// 预约管理相关接口
+// ================================
+
+/**
+ * @route POST /api/venue/reservation
+ * @desc 提交场地预约
+ * @access Private
+ */
 router.post('/reservation',
   authenticateToken,
   validate(schemas.venue.submitReservation),
-  async (req, res) => {
-    try {
-      // 实现场地预约逻辑
-      return response.success(res, { reservationId: 'reservation_123' }, '预约提交成功');
-    } catch (error) {
-      return response.serverError(res, '预约提交失败', error.message);
-    }
-  }
+  venueController.submitReservation
 );
 
-// 获取预约记录
+/**
+ * @route GET /api/venue/reservations
+ * @desc 获取用户预约记录
+ * @access Private
+ */
 router.get('/reservations',
   authenticateToken,
-  async (req, res) => {
-    try {
-      // 实现获取预约记录逻辑
-      return response.success(res, { records: [], total: 0 }, '获取预约记录成功');
-    } catch (error) {
-      return response.serverError(res, '获取预约记录失败', error.message);
-    }
-  }
+  validate(schemas.venue.getUserReservations, 'query'),
+  venueController.getUserReservations
 );
 
-// 获取场地安排表
-router.get('/schedule',
+/**
+ * @route GET /api/venue/reservation/:reservationId
+ * @desc 获取预约详情
+ * @access Private
+ */
+router.get('/reservation/:reservationId',
   authenticateToken,
-  async (req, res) => {
-    try {
-      // 实现获取场地安排表逻辑
-      return response.success(res, [], '获取场地安排表成功');
-    } catch (error) {
-      return response.serverError(res, '获取场地安排表失败', error.message);
-    }
-  }
+  venueController.getReservationDetail
+);
+
+/**
+ * @route DELETE /api/venue/reservation/:reservationId
+ * @desc 取消预约
+ * @access Private
+ */
+router.delete('/reservation/:reservationId',
+  authenticateToken,
+  venueController.cancelReservation
+);
+
+// ================================
+// 工具接口
+// ================================
+
+/**
+ * @route GET /api/venue/check-availability
+ * @desc 检查时间段可用性
+ * @access Private
+ */
+router.get('/check-availability',
+  authenticateToken,
+  validate(schemas.venue.checkTimeAvailability, 'query'),
+  venueController.checkTimeAvailability
 );
 
 module.exports = router;
